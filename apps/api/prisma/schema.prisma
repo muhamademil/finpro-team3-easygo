@@ -1,21 +1,171 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+// schema.prisma
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum Role {
+  USER
+  TENANT
+}
 
-  @@map("samples") // if you want to use snake_case format
+enum BookingStatus {
+  MENUNGGU_PEMBAYARAN
+  MENUNGGU_KONFIRMASI
+  DIKONFIRMASI
+  DIBATALKAN
+}
+
+enum AdjustmentType {
+  PERCENTAGE
+  NOMINAL
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  MAGIC_LINK_LOGIN
+}
+
+model User {
+  id             String      @id @default(uuid())
+  name           String
+  email          String      @unique
+  passwordHash   String
+  role           Role        @default(USER)
+  isVerified     Boolean     @default(false)
+  profilePicture String?
+  createdAt      DateTime    @default(now())
+
+  tenantProfile  TenantProfile?
+  properties     Property[]     @relation("TenantProperties")
+  bookings       Booking[]
+  reviews        Review[]       @relation("UserReviews")
+  reviewReplies  Review[]       @relation("TenantReplies")
+  userTokens     UserToken[]
+  peakRates      PeakSeasonRate[] @relation("TenantPeakRates")
+}
+
+model TenantProfile {
+  id      String @id @default(uuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String @unique
+  bio     String?
+  phone   String?
+  address String?
+}
+
+model Property {
+  id          String     @id @default(uuid())
+  name        String
+  description String
+  location    String
+  mainImage   String?
+  createdAt   DateTime   @default(now())
+
+  tenant      User       @relation("TenantProperties", fields: [tenantId], references: [id])
+  tenantId    String
+  category    PropertyCategory @relation(fields: [categoryId], references: [id])
+  categoryId  String
+
+  rooms       Room[]
+  reviews     Review[]   @relation("PropertyReviews")
+}
+
+model PropertyCategory {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  properties  Property[]
+}
+
+model Room {
+  id            String             @id @default(uuid())
+  name          String
+  description   String?
+  basePrice     Float
+  capacity      Int
+  picture       String?
+
+  property      Property           @relation(fields: [propertyId], references: [id])
+  propertyId    String
+
+  availabilities RoomAvailability[]
+  bookings      Booking[]
+}
+
+model RoomAvailability {
+  id            String   @id @default(uuid())
+  room          Room     @relation(fields: [roomId], references: [id])
+  roomId        String
+  date          DateTime
+  isAvailable   Boolean  @default(true)
+  priceOverride Float?
+}
+
+model PeakSeasonRate {
+  id              String   @id @default(uuid())
+  tenant          User     @relation("TenantPeakRates", fields: [tenantId], references: [id])
+  tenantId        String
+  date            DateTime
+  adjustmentType  AdjustmentType
+  adjustmentValue Float
+}
+
+model Booking {
+  id             String    @id @default(uuid())
+  user           User      @relation(fields: [userId], references: [id])
+  userId         String
+  room           Room      @relation(fields: [roomId], references: [id])
+  roomId         String
+
+  startDate      DateTime
+  endDate        DateTime
+  totalPrice     Float
+  status         BookingStatus @default(MENUNGGU_PEMBAYARAN)
+  paymentProofUrl String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  review         Review?   @relation("BookingReview")
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  comment    String
+  createdAt  DateTime @default(now())
+
+  user       User     @relation("UserReviews", fields: [userId], references: [id])
+  userId     String
+
+  booking    Booking? @relation("BookingReview", fields: [bookingId], references: [id])
+  bookingId  String? @unique
+
+  property   Property  @relation("PropertyReviews", fields: [propertyId], references: [id])
+  propertyId String
+
+  parent     Review?   @relation("ReplyToReview", fields: [parentId], references: [id])
+  parentId   String?
+
+  replies    Review[]  @relation("ReplyToReview")
+  tenant     User?     @relation("TenantReplies", fields: [tenantId], references: [id])
+  tenantId   String?
+}
+
+model UserToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  type      TokenType
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  expiresAt DateTime
+  isUsed    Boolean   @default(false)
+  createdAt DateTime  @default(now())
 }

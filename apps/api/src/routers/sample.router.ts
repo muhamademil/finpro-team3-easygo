@@ -1,5 +1,6 @@
 import { SampleController } from '@/controllers/sample.controller';
 import { Router } from 'express';
+import { PaymentController } from '@/controllers/payment.controller';
 
 export class SampleRouter {
   private router: Router;
