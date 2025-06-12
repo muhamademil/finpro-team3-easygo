@@ -1,10 +1,80 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import nextFontLocal from 'next/font/local';
 import './globals.css';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 
-const inter = Inter({ subsets: ['latin'] });
+const satoshi = nextFontLocal({
+  src: [
+    {
+      path: './fonts/Satoshi/Satoshi-Regular.otf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './fonts/Satoshi/Satoshi-Italic.otf',
+      weight: '400',
+      style: 'italic',
+    },
+    {
+      path: './fonts/Satoshi/Satoshi-Medium.otf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: './fonts/Satoshi/Satoshi-MediumItalic.otf',
+      weight: '500',
+      style: 'italic',
+    },
+    {
+      path: './fonts/Satoshi/Satoshi-Bold.otf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: './fonts/Satoshi/Satoshi-BoldItalic.otf',
+      weight: '700',
+      style: 'italic',
+    },
+    {
+      path: './fonts/Satoshi/Satoshi-Black.otf',
+      weight: '900',
+      style: 'normal',
+    },
+    {
+      path: './fonts/Satoshi/Satoshi-BlackItalic.otf',
+      weight: '900',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-satoshi', // Nama CSS Variable
+  display: 'swap',
+});
+
+const clashGrotesk = nextFontLocal({
+  src: [
+    {
+      path: './fonts/ClashGrotesk/ClashGrotesk-Regular.otf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './fonts/ClashGrotesk/ClashGrotesk-Medium.otf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: './fonts/ClashGrotesk/ClashGrotesk-Semibold.otf',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: './fonts/ClashGrotesk/ClashGrotesk-Bold.otf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-clash-grotesk', // Nama CSS Variable
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -13,16 +83,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Header />
-        {children}
-        <Footer />
-      </body>
+    <html lang="en" className={`${satoshi.variable} ${clashGrotesk.variable}`}>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }
