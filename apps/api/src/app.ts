@@ -1,68 +1,57 @@
-import express, {
-  json,
-  urlencoded,
-  Express,
-  Request,
-  Response,
-  NextFunction,
-  Router,
-} from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
-import { SampleRouter } from './routers/sample.router';
+import { PropertyRouter } from './routers/property.router';
 
 export default class App {
   private app: Express;
 
   constructor() {
     this.app = express();
-    this.configure();
-    this.routes();
-    this.handleError();
+    this.setMiddleware();
+    this.setRoutes();
+    this.setErrorHandlers();
   }
 
-  private configure(): void {
+  private setMiddleware(): void {
     this.app.use(cors());
-    this.app.use(json());
-    this.app.use(urlencoded({ extended: true }));
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
   }
 
-  private handleError(): void {
-    // not found
-    this.app.use((req: Request, res: Response, next: NextFunction) => {
-      if (req.path.includes('/api/')) {
-        res.status(404).send('Not found !');
-      } else {
-        next();
-      }
-    });
-
-    // error
-    this.app.use(
-      (err: Error, req: Request, res: Response, next: NextFunction) => {
-        if (req.path.includes('/api/')) {
-          console.error('Error : ', err.stack);
-          res.status(500).send('Error !');
-        } else {
-          next();
-        }
-      },
-    );
-  }
-
-  private routes(): void {
-    const sampleRouter = new SampleRouter();
-
+  private setRoutes(): void {
+    // Root check
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
 
-    this.app.use('/api/samples', sampleRouter.getRouter());
+    // Feature routes
+    const propertyRouter = new PropertyRouter();
+    this.app.use('/api/properties', propertyRouter.getRouter());
+  }
+
+  private setErrorHandlers(): void {
+    // 404 Not Found
+    this.app.use((req: Request, res: Response, next: NextFunction) => {
+      if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: 'Route not found' });
+      }
+      next();
+    });
+
+    // General Error Handler
+    this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+      if (req.path.startsWith('/api')) {
+        console.error('Server Error:', err.stack);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+      next();
+    });
   }
 
   public start(): void {
     this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
+      console.log(`Server ready at: http://localhost:${PORT}/api`);
     });
   }
 }

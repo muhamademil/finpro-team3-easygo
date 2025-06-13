@@ -1,6 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { SnapRequest } from '@/types/midtrans';
+import { SnapRequest } from '@/models/midtrans.interface';
 
 dotenv.config();
 

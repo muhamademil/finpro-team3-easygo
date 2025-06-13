@@ -35,7 +35,7 @@ enum TokenType {
 }
 
 model User {
-  id             String      @id @default(uuid())
+  id             Int      @id @default(autoincrement())
   name           String
   email          String      @unique
   passwordHash   String
@@ -54,81 +54,89 @@ model User {
 }
 
 model TenantProfile {
-  id      String @id @default(uuid())
+  id      Int @id @default(autoincrement())
   user    User   @relation(fields: [userId], references: [id])
-  userId  String @unique
+  userId  Int @unique
   bio     String?
   phone   String?
   address String?
 }
 
+
 model Property {
-  id          String     @id @default(uuid())
+  id          Int     @id @default(autoincrement())
   name        String
   description String
-  location    String
+  location    Location
+  category    PropertyCategory
   mainImage   String?
   createdAt   DateTime   @default(now())
 
   tenant      User       @relation("TenantProperties", fields: [tenantId], references: [id])
-  tenantId    String
-  category    PropertyCategory @relation(fields: [categoryId], references: [id])
-  categoryId  String
+  tenantId    Int
 
   rooms       Room[]
   reviews     Review[]   @relation("PropertyReviews")
 }
 
-model PropertyCategory {
-  id          String     @id @default(uuid())
-  name        String
-  description String?
-  properties  Property[]
+enum PropertyCategory {
+  VILLA
+  APARTMENT
+  HOMESTAY
+}
+
+enum Location {
+  BALI
+  JAKARTA
+  SURABAYA
+  BANDUNG
+  YOGYAKARTA
+  MALANG
 }
 
 model Room {
-  id            String             @id @default(uuid())
+  id            Int             @id @default(autoincrement())
   name          String
   description   String?
-  basePrice     Float
+  basePrice     String
   capacity      Int
   picture       String?
 
   property      Property           @relation(fields: [propertyId], references: [id])
-  propertyId    String
+  propertyId    Int
 
   availabilities RoomAvailability[]
   bookings      Booking[]
 }
 
 model RoomAvailability {
-  id            String   @id @default(uuid())
+  id            Int   @id @default(autoincrement())
   room          Room     @relation(fields: [roomId], references: [id])
-  roomId        String
+  roomId        Int
   date          DateTime
   isAvailable   Boolean  @default(true)
-  priceOverride Float?
+  priceOverride String?
 }
 
 model PeakSeasonRate {
-  id              String   @id @default(uuid())
+  id              Int   @id @default(autoincrement())
   tenant          User     @relation("TenantPeakRates", fields: [tenantId], references: [id])
-  tenantId        String
+  tenantId        Int
   date            DateTime
   adjustmentType  AdjustmentType
-  adjustmentValue Float
+  adjustmentValue String
 }
 
 model Booking {
-  id             String    @id @default(uuid())
+  id             Int    @id @default(autoincrement())
   user           User      @relation(fields: [userId], references: [id])
-  userId         String
+  userId         Int
   room           Room      @relation(fields: [roomId], references: [id])
-  roomId         String
+  roomId         Int
 
   startDate      DateTime
   endDate        DateTime
-  totalPrice     Float
+  totalPrice     String
   status         BookingStatus @default(MENUNGGU_PEMBAYARAN)
   paymentProofUrl String?
   createdAt      DateTime  @default(now())
@@ -138,33 +146,33 @@ model Booking {
 }
 
 model Review {
-  id         String   @id @default(uuid())
+  id         Int   @id @default(autoincrement())
   comment    String
   createdAt  DateTime @default(now())
 
   user       User     @relation("UserReviews", fields: [userId], references: [id])
-  userId     String
+  userId     Int
 
   booking    Booking? @relation("BookingReview", fields: [bookingId], references: [id])
-  bookingId  String? @unique
+  bookingId  Int? @unique
 
   property   Property  @relation("PropertyReviews", fields: [propertyId], references: [id])
-  propertyId String
+  propertyId Int
 
   parent     Review?   @relation("ReplyToReview", fields: [parentId], references: [id])
-  parentId   String?
+  parentId   Int?
 
   replies    Review[]  @relation("ReplyToReview")
   tenant     User?     @relation("TenantReplies", fields: [tenantId], references: [id])
-  tenantId   String?
+  tenantId   Int?
 }
 
 model UserToken {
-  id        String    @id @default(uuid())
+  id        Int    @id @default(autoincrement())
   token     String    @unique
   type      TokenType
   user      User      @relation(fields: [userId], references: [id])
-  userId    String
+  userId    Int
   expiresAt DateTime
   isUsed    Boolean   @default(false)
   createdAt DateTime  @default(now())
