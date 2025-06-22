@@ -2,113 +2,123 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import Button from '@/components/Elements/Button';
 import InputForm from '@/components/Elements/Input';
+import { SOCIAL_LOGINS } from '@/constants/auth';
+import Image from 'next/image';
+import { initiateRegistrationAPI } from '@/services/auth.service';
+import axios from 'axios';
 
-// Tipe data untuk peran agar konsisten
-type UserRole = 'traveller' | 'tenant';
+type UserRole = 'TRAVELLER' | 'TENANT';
 const FormRegister = () => {
-  // State untuk form fields
-  const [nama, setNama] = useState('');
+  // State form fields
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  // 1. State untuk melacak tab yang aktif
-  const [activeTab, setActiveTab] = useState<UserRole>('traveller');
+  const [activeTab, setActiveTab] = useState<UserRole>('TRAVELLER');
 
-  // 2. Handler untuk form submission
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Handler form submission
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = {
-      nama,
-      email,
-      password,
-      role: activeTab, // <-- Menyertakan peran yang dipilih
-    };
-    console.log('Mendaftarkan data:', formData);
-    // Di sini Anda akan menambahkan logika untuk call API
+    setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const response = await initiateRegistrationAPI({
+        email,
+        role: activeTab,
+      });
+      setSuccessMessage(response.data.message);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.message || 'Email atau password salah.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+    // call API
   };
 
-  // 3. Class untuk styling tab agar tidak berulang
   const baseTabClass = 'inline-block w-full p-4 border-b-2 rounded-t-lg';
   const activeTabClass = 'text-primary-blue border-primary-blue';
   const inactiveTabClass =
-    'border-transparent hover:text-gray-600 hover:border-gray-300';
+    'text-gray-600 border-transparent hover:text-gray-600 hover:border-gray-300';
 
   return (
     <div className="w-full sm:w-[448px] bg-white/20 backdrop-blur-xl rounded-xl p-6 md:p-8">
+      <div className="relative mx-auto mb-4 w-28 sm:w-32 md:w-[107px] aspect-[107/24]">
+        <Image
+          src="https://res.cloudinary.com/dohpngcuj/image/upload/v1749717672/easylogo_oloc1b.png"
+          alt="easygo"
+          fill
+          className="object-contain"
+          priority
+        />
+      </div>
       <div className="w-full text-center mb-6">
         <h1 className="text-xl md:text-2xl text-slate-900 font-fat font-semibold">
           Buat Akun Baru
         </h1>
         <p className="text-slate-500 text-sm">
-          Pilih peranmu dan mulai petualanganmu!
+          Daftar Sekarang. Liburan jadi Gampang!
         </p>
       </div>
 
-      {/* === BAGIAN TAB DIMULAI DI SINI === */}
-      <div className="text-sm font-medium text-cente border-b border-gray-200 mb-4">
+      <div className="text-sm font-medium text-center">
         <ul className="flex -mb-px">
           <li className="flex-1">
             <button
               type="button"
-              onClick={() => setActiveTab('traveller')}
-              className={`${baseTabClass} ${activeTab === 'traveller' ? activeTabClass : inactiveTabClass}`}
+              onClick={() => setActiveTab('TRAVELLER')}
+              className={`${baseTabClass} ${activeTab === 'TRAVELLER' ? activeTabClass : inactiveTabClass}`}
             >
-              Traveller
+              <span className="text-lg font-semibold">Traveller</span>
             </button>
           </li>
           <li className="flex-1">
             <button
               type="button"
-              onClick={() => setActiveTab('tenant')}
-              className={`${baseTabClass} ${activeTab === 'tenant' ? activeTabClass : inactiveTabClass}`}
+              onClick={() => setActiveTab('TENANT')}
+              className={`${baseTabClass} ${activeTab === 'TENANT' ? activeTabClass : inactiveTabClass}`}
             >
-              Tenant
+              <span className="text-lg font-semibold"> Tenant</span>
             </button>
           </li>
         </ul>
       </div>
-      {/* === BAGIAN TAB SELESAI === */}
 
       <form onSubmit={handleRegister}>
-        {/* Di sini Anda bisa menambahkan input yang berbeda berdasarkan 'activeTab' jika perlu */}
-        <InputForm
-          label="Nama Lengkap"
-          id="nama"
-          type="text"
-          placeholder="Nama kamu"
-          value={nama}
-          onChange={(e) => setNama(e.target.value)}
-          required
-        />
         <InputForm
           label="Email"
           id="email"
           type="email"
-          placeholder="Email kamu"
+          placeholder="Masukan email kamu"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <InputForm
-          label="Password"
-          id="password"
-          type="password"
-          placeholder="Password kamu"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <p className="text-slate-500 italic text-xs mt-2">
+          *Kami akan mengirimkan verifikasi registrasi ke email kamu
+        </p>
 
         <Button
+          disabled={isLoading}
           type="submit"
           variant="solid"
-          className="w-full mt-6 font-fat font-medium "
+          className="w-full mt-6 font-fat font-medium"
         >
-          Daftar sebagai {activeTab === 'traveller' ? 'Traveller' : 'Tenant'}
+          {isLoading
+            ? 'Memproses...'
+            : `Daftar sebagai ${activeTab === 'TRAVELLER' ? 'TRAVELLER' : 'TENANT'}`}
         </Button>
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        {successMessage && (
+          <p className="text-green-500 text-sm mt-2">{successMessage}</p>
+        )}
       </form>
 
       <div className="text-center mt-4 text-sm text-slate-600">
@@ -119,6 +129,24 @@ const FormRegister = () => {
         >
           Masuk di sini
         </Link>
+      </div>
+      <div className="my-4 border-t border-dashed border-gray-300"></div>
+
+      <div className="flex flex-col sm:flex-row gap-2">
+        {SOCIAL_LOGINS.map((social) => (
+          <Button
+            key={social.alt}
+            className="w-full sm:flex-1 bg-white hover:bg-gray-100 cursor-pointer"
+          >
+            <Image
+              src={social.src}
+              alt={social.alt}
+              width={social.width}
+              height={social.height}
+              className="mx-auto"
+            />
+          </Button>
+        ))}
       </div>
     </div>
   );
