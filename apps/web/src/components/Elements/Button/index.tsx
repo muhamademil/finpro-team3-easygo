@@ -20,7 +20,7 @@ const Button = ({
   variant = 'solid',
 }: ButtonProps) => {
   const baseClasses =
-    'px-4 py-[12px] text-sm text-slate-800 rounded-lg transition disabled:cursor-not-allowed';
+    'px-5 py-[12px] text-sm text-slate-800 rounded-lg transition disabled:cursor-not-allowed';
 
   const variantClasses = {
     solid:

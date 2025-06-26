@@ -12,6 +12,7 @@ import CONFIG from './config';
 import { AuthRouter } from './routers/auth.router';
 import passport from 'passport';
 import session from 'express-session';
+import { PropertyRouter } from './routers/property.router';
 // import { configurePassport } from './lib/config/passport.config';
 
 export default class App {
@@ -68,8 +69,10 @@ export default class App {
 
   private routes(): void {
     const authRouter = new AuthRouter();
+    const propertyRouter = new PropertyRouter();
 
     this.app.use('/api/auth', authRouter.getRouter());
+    this.app.use('/api/properties', propertyRouter.getRouter());
   }
 
   public start(): void {

@@ -93,15 +93,17 @@ model Tenant {
 
 /// Data properti yang disewakan tenant.
 model Property {
-  id          String @id @default(uuid())
-  tenant      Tenant @relation(fields: [tenant_id], references: [id])
-  tenant_id   String /// FK -> Tenant
-  name        String
-  description String
-  address     String
-  city        String
+  id             String  @id @default(uuid())
+  tenant         Tenant  @relation(fields: [tenant_id], references: [id])
+  tenant_id      String /// FK -> Tenant
+  name           String
+  description    String
+  address        String
+  city           String
+  is_recommended Boolean @default(false)
+  is_flash_sale  Boolean @default(false)
+  lowest_price   Int     @default(0)
 
-  /// Memecah `point` menjadi latitude dan longitude untuk kemudahan penggunaan
   latitude  Float
   longitude Float
 
@@ -302,4 +304,12 @@ model RegistrationToken {
   user_id String @unique // Foreign key ke User. Unik agar 1 user hanya punya 1 token registrasi.
 
   @@map("registration_tokens")
+}
+
+model NewsletterSubscription {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  created_at DateTime @default(now())
+
+  @@map("newsletter_subscriptions")
 }

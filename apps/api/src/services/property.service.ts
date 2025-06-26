@@ -1,69 +1,62 @@
-// import { prisma } from '@/lib/prisma';
-// import {
-//   CreatePropertyInput,
-//   UpdatePropertyInput,
-//   PropertyQuery,
-// } from '@/models/property.interface';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
-// export class PropertyService {
-//   public async createProperty(tenantId: number, input: CreatePropertyInput) {
-//   const data = {
-//     ...input,
-//     tenantId,
-//   };
+export class PropertyService {
+  public async getProperties(queryParams: any) {
+    const {
+      city,
+      category,
+      type,
+      sortBy,
+      orderBy = 'asc',
+      limit = '10',
+      page = '1',
+    } = queryParams;
 
-//   console.log("Creating with data:", data);
+    const where: Prisma.PropertyWhereInput = {};
 
-//   return await prisma.property.create({
-//     data,
-//   });
-// }
+    if (city) {
+      where.city = { contains: city as string, mode: 'insensitive' };
+    }
+    if (category) {
+      where.category = category as any; // Sesuaikan dengan tipe enum Anda
+    }
+    if (type === 'recommendation') {
+      where.is_recommended = true;
+    }
 
-//   public async getAllProperties(query: PropertyQuery) {
-//     const {
-//       location,
-//       name,
-//       category,
-//       sortBy = 'createdAt',
-//       order = 'desc',
-//     } = query;
+    const orderByClause: Prisma.PropertyOrderByWithRelationInput = {};
 
-//     return await prisma.property.findMany({
-//       where: {
-//         location,
-//         name: name ? { contains: name, mode: 'insensitive' } : undefined,
-//         category,
-//       },
-//       orderBy: {
-//         [sortBy]: order,
-//       },
-//       include: {
-//         rooms: true,
-//         reviews: true,
-//       },
-//     });
-//   }
+    if (sortBy === 'price') {
+      orderByClause.lowest_price = orderBy;
+    }
 
-//   public async getPropertyById(id: string) {
-//     return await prisma.property.findUnique({
-//       where: { id: Number(id) },
-//       include: {
-//         rooms: true,
-//         reviews: true,
-//       },
-//     });
-//   }
+    const take = parseInt(limit);
+    const skip = (parseInt(page) - 1) * take;
 
-//   public async updateProperty(id: string, data: UpdatePropertyInput) {
-//     return await prisma.property.update({
-//       where: { id: Number(id) },
-//       data,
-//     });
-//   }
+    const properties = await prisma.property.findMany({
+      where,
+      orderBy: orderByClause,
+      take,
+      skip,
+      include: {
+        images: {
+          take: 1,
+        },
+      },
+    });
 
-//   public async deleteProperty(id: string) {
-//     return await prisma.property.delete({
-//       where: { id: Number(id) },
-//     });
-//   }
-// }
+    // Query total data (pagination frontend)
+    const totalProperties = await prisma.property.count({ where });
+
+    return {
+      properties,
+      pagination: {
+        total: totalProperties,
+        page: parseInt(page),
+        limit: take,
+        totalPages: Math.ceil(totalProperties / take),
+      },
+    };
+  }
+}
