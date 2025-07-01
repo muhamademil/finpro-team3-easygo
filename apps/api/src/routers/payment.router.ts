@@ -7,4 +7,4 @@ const controller = new PaymentController();
 router.post('/payment/snap', controller.createSnapTransaction);
 router.post('/payment/core', controller.chargeWithCore);
 
-export default router;  
+export default router;

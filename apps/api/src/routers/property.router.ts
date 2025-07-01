@@ -12,11 +12,11 @@ export class PropertyRouter {
   }
 
     private setRoutes():void {
-        this.router.post('/', this.propertyController.create.bind(this.propertyController));
-        this.router.get('/', this.propertyController.findAll.bind(this.propertyController));
-        this.router.get('/:id', this.propertyController.findById.bind(this.propertyController));
-        this.router.put('/:id', this.propertyController.update.bind(this.propertyController));
-        this.router.delete('/:id', this.propertyController.delete.bind(this.propertyController));
+        this.router.post('/property', this.propertyController.create.bind(this.propertyController));
+        this.router.get('/property', this.propertyController.findAll.bind(this.propertyController));
+        this.router.get('/property/:id', this.propertyController.findById.bind(this.propertyController));
+        this.router.put('/property/:id', this.propertyController.update.bind(this.propertyController));
+        this.router.delete('/property/:id', this.propertyController.delete.bind(this.propertyController));
     }
 
     public getRouter(): Router {

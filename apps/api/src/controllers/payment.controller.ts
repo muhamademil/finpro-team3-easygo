@@ -16,6 +16,8 @@ export class PaymentController {
         } catch (error) {
             res.status(500).json({ error: (error as Error).message, detail: error });
         }
+
+        
     };
 
     chargeWithCore = async (req: Request, res: Response): Promise<void> => {

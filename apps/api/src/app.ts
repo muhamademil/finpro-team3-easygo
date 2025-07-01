@@ -2,6 +2,8 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
 import { PropertyRouter } from './routers/property.router';
+import { BookingRouter } from './routers/booking.router';
+import { RoomRouter } from './routers/room.router';
 
 export default class App {
   private app: Express;
@@ -27,7 +29,12 @@ export default class App {
 
     // Feature routes
     const propertyRouter = new PropertyRouter();
-    this.app.use('/api/properties', propertyRouter.getRouter());
+    const bookingRouter = new BookingRouter();
+    const roomRouter = new RoomRouter()
+
+    this.app.use('/api', propertyRouter.getRouter());
+    this.app.use('/api', bookingRouter.getRouter());
+    this.app.use('/api', roomRouter.getRouter());
   }
 
   private setErrorHandlers(): void {
