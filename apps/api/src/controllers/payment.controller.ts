@@ -1,30 +1,54 @@
-// import { Request, Response } from 'express';
-// import { MidtransService } from '@/services/midtrans.service';
+import { Request, Response } from 'express';
+import { PaymentService } from '@/services/payment.service';
 
-// export class PaymentController {
-//   private service: MidtransService;
+const service = new PaymentService();
 
-//   constructor() {
-//     this.service = new MidtransService();
-//   }
+export class PaymentController {
+  public async createPayment(req: Request, res: Response): Promise<void> {
+    try {
+      const payload = req.body;
+      const newPayment = await service.createPayment(payload);
 
-    // createSnapTransaction = async (req: Request, res: Response): Promise<void> => {
-    //     try {
-    //         const redirectUrl = await this.service.createSnapTransaction(req.body);
-    //         res.status(201).json({ redirectUrl });
-    //     } catch (error) {
-    //         res.status(500).json({ error: (error as Error).message, detail: error });
-    //     }
+      res.status(201).json({
+        message: 'Payment created successfully',
+        data: newPayment,
+      });
+    } catch (error) {
+      console.error('❌ Create Payment Error:', error);
+      res.status(500).json({ message: 'Failed to create payment', error });
+    }
+  }
 
-        
-    // };
+  public async getAllPayments(req: Request, res: Response): Promise<void> {
+    try {
+      const payments = await service.getAllPayments();
+      res.json(payments);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch payments', error });
+    }
+  }
 
-//   chargeWithCore = async (req: Request, res: Response): Promise<void> => {
-//     try {
-//       const result = await this.service.chargeWithCore(req.body);
-//       res.status(200).json(result);
-//     } catch (error) {
-//       res.status(500).json({ error: (error as Error).message });
-//     }
-//   };
-// }
+  public async getPaymentById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const payment = await service.getPaymentById(id);
+      if (!payment) {
+        res.status(404).json({ message: 'Payment not found' });
+        return;
+      }
+      res.json(payment);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch payment', error });
+    }
+  }
+
+  public async deletePayment(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      await service.deletePayment(id);
+      res.json({ message: 'Payment deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete payment', error });
+    }
+  }
+}
