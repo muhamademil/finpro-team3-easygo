@@ -10,10 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// =================================
-// ENUMS (Tipe data pilihan)
-// =================================
-
 enum Role {
   TRAVELLER
   TENANT
