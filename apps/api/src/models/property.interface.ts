@@ -21,5 +21,3 @@ export interface PropertyQuery {
   sortBy?: 'createdAt' | 'name'
   order?: 'asc' | 'desc'
 }
-
-

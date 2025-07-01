@@ -1,64 +1,86 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, {
+  json,
+  urlencoded,
+  Express,
+  Request,
+  Response,
+  NextFunction,
+  Router,
+} from 'express';
 import cors from 'cors';
-import { PORT } from './config';
-import { PropertyRouter } from './routers/property.router';
+import CONFIG from './config';
+import { AuthRouter } from './routers/auth.router';
 import { BookingRouter } from './routers/booking.router';
 import { RoomRouter } from './routers/room.router';
+// import passport from 'passport';
+// import session from 'express-session';
+// import { configurePassport } from './lib/config/passport.config';
 
 export default class App {
   private app: Express;
 
   constructor() {
     this.app = express();
-    this.setMiddleware();
-    this.setRoutes();
-    this.setErrorHandlers();
+    this.configure();
+    this.routes();
+    this.handleError();
   }
 
-  private setMiddleware(): void {
+  private configure(): void {
     this.app.use(cors());
-    this.app.use(express.json());
-    this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(json());
+    this.app.use(urlencoded({ extended: true }));
+
+    // this.app.use(
+    //   session({
+    //     secret: 'your-session-secret', // sebaiknya pindah ke .env juga
+    //     resave: false,
+    //     saveUninitialized: false,
+    //   }),
+    // );
+
+    // this.app.use(passport.initialize());
+    // this.app.use(passport.session());
+
+    // configurePassport();
   }
 
-  private setRoutes(): void {
-    // Root check
-    this.app.get('/api', (req: Request, res: Response) => {
-      res.send(`Hello, Purwadhika Student API!`);
+  private handleError(): void {
+    // not found
+    this.app.use((req: Request, res: Response, next: NextFunction) => {
+      if (req.path.includes('/api/')) {
+        res.status(404).send('Not found !');
+      } else {
+        next();
+      }
     });
 
-    // Feature routes
-    const propertyRouter = new PropertyRouter();
-    const bookingRouter = new BookingRouter();
-    const roomRouter = new RoomRouter()
+    // error
+    this.app.use(
+      (err: Error, req: Request, res: Response, next: NextFunction) => {
+        if (req.path.includes('/api/')) {
+          console.error('Error : ', err.stack);
+          res.status(500).send('Error !');
+        } else {
+          next();
+        }
+      },
+    );
+  }
 
-    this.app.use('/api', propertyRouter.getRouter());
+  private routes(): void {
+    const authRouter = new AuthRouter();
+    const bookingRouter = new BookingRouter();
+    const roomRouter = new RoomRouter();
+
+    this.app.use('/api/auth', authRouter.getRouter());
     this.app.use('/api', bookingRouter.getRouter());
     this.app.use('/api', roomRouter.getRouter());
   }
 
-  private setErrorHandlers(): void {
-    // 404 Not Found
-    this.app.use((req: Request, res: Response, next: NextFunction) => {
-      if (req.path.startsWith('/api')) {
-        return res.status(404).json({ error: 'Route not found' });
-      }
-      next();
-    });
-
-    // General Error Handler
-    this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-      if (req.path.startsWith('/api')) {
-        console.error('Server Error:', err.stack);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
-      next();
-    });
-  }
-
   public start(): void {
-    this.app.listen(PORT, () => {
-      console.log(`Server ready at: http://localhost:${PORT}/api`);
+    this.app.listen(CONFIG.PORT, () => {
+      console.log(`  ➜  [API] Local:   http://localhost:${CONFIG.PORT}/`);
     });
   }
 }

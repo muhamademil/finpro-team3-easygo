@@ -1,28 +1,52 @@
 // src/services/room.service.ts
-import prisma from "@/prisma";
+import { prisma } from '@/prisma/client';
+import { CreateRoomInput, UpdateRoomInput } from '@/types/room.types';
 
 export class RoomService {
-  public async findById(id: number) {
-    return prisma.room.findUnique({
-      where: { id },
+  public async createRoom(data: CreateRoomInput) {
+    return await prisma.room.create({
+      data: {
+        property: { connect: { id: data.property_id } },
+        name: data.name,
+        base_price: data.base_price,
+        max_guest: data.max_guest,
+      },
       include: {
-        property: true, // jika ingin tampilkan info property juga
+        images: true,
+        property: true,
       },
     });
   }
 
-  public async getAvailability(roomId: number, start: string, end: string) {
-    return prisma.roomAvailability.findMany({
-      where: {
-        roomId,
-        date: {
-          gte: new Date(start),
-          lte: new Date(end),
-        },
+  public async findAllRooms() {
+    return await prisma.room.findMany({
+      include: {
+        images: true,
+        property: true,
       },
-      orderBy: {
-        date: 'asc',
+    });
+  }
+
+  public async findRoomById(id: string) {
+    return await prisma.room.findUnique({
+      where: { id },
+      include: {
+        images: true,
+        property: true,
       },
+    });
+  }
+
+  public async updateRoom(id: string, data: UpdateRoomInput) {
+    return await prisma.room.update({
+      where: { id },
+      data,
+    });
+  }
+
+  public async deleteRoom(id: string) {
+    return await prisma.room.delete({
+      where: { id },
     });
   }
 }

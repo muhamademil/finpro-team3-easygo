@@ -11,8 +11,11 @@ export class RoomRouter {
   }
 
   private setRoutes(): void {
-    this.router.get('/room/:id', this.controller.findById.bind(this.controller));
-    this.router.get('/room/:id/availability', this.controller.getAvailability.bind(this.controller));
+    this.router.post('/rooms', this.controller.createRoom.bind(this.controller));
+    this.router.get('/rooms', this.controller.findAllRooms.bind(this.controller));
+    this.router.get('/rooms/:id', this.controller.findRoomById.bind(this.controller));
+    this.router.put('/rooms/:id', this.controller.updateRoom.bind(this.controller));
+    this.router.delete('/rooms/:id', this.controller.deleteRoom.bind(this.controller));
   }
 
   public getRouter(): Router {

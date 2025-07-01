@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-// schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -12,168 +11,291 @@ datasource db {
 }
 
 enum Role {
-  USER
+  TRAVELLER
   TENANT
 }
 
-enum BookingStatus {
-  MENUNGGU_PEMBAYARAN
-  MENUNGGU_KONFIRMASI
-  DIKONFIRMASI
-  DIBATALKAN
+enum PropertyCategory {
+  APARTMENT
+  VILLA
+  GUEST_HOUSE
 }
 
-enum AdjustmentType {
-  PERCENTAGE
+enum PeakPriceType {
+  PERCENT
   NOMINAL
 }
 
-enum TokenType {
-  EMAIL_VERIFICATION
-  PASSWORD_RESET
-  MAGIC_LINK_LOGIN
+enum BookingStatus {
+  PENDING_PAYMENT
+  PENDING_CONFIRMATION
+  CONFIRMED
+  CANCELLED
+  COMPLETED
 }
 
+enum PaymentMethod {
+  MANUAL
+  MIDTRANS
+}
+
+// =================================
+// MODELS (Tabel-tabel database)
+// =================================
+
+/// Menyimpan data seluruh pengguna (traveller & tenant).
 model User {
-  id             Int      @id @default(autoincrement())
-  name           String
-  email          String      @unique
-  passwordHash   String
-  role           Role        @default(USER)
-  isVerified     Boolean     @default(false)
-  profilePicture String?
-  createdAt      DateTime    @default(now())
+  id          String  @id @default(uuid())
+  name        String?
+  email       String  @unique
+  phone       String?
+  password    String? /// Opsional, karena ada OAuth.
+  photo_url   String?
+  role        Role    @default(TRAVELLER)
+  is_verified Boolean @default(false)
 
-  tenantProfile  TenantProfile?
-  properties     Property[]     @relation("TenantProperties")
-  bookings       Booking[]
-  reviews        Review[]       @relation("UserReviews")
-  reviewReplies  Review[]       @relation("TenantReplies")
-  userTokens     UserToken[]
-  peakRates      PeakSeasonRate[] @relation("TenantPeakRates")
+  /// Kolom untuk Social Login/OAuth
+  provider    String? @default("email") /// 'email', 'google', 'facebook'
+  provider_id String? /// ID unik dari provider OAuth
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  tenant                  Tenant? /// Relasi one-to-one dengan Tenant
+  bookings                Booking[] /// Seorang user bisa punya banyak booking
+  reviews                 Review[] /// Seorang user bisa punya banyak review
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  RegistrationToken       RegistrationToken[]
+
+  @@map("users")
 }
 
-model TenantProfile {
-  id      Int @id @default(autoincrement())
-  user    User   @relation(fields: [userId], references: [id])
-  userId  Int @unique
-  bio     String?
-  phone   String?
-  address String?
+/// Tambahan data untuk user dengan role tenant.
+model Tenant {
+  id                String   @id @default(uuid())
+  user              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id           String   @unique /// FK -> User (dibuat unik untuk relasi one-to-one)
+  city              String
+  bank_account      String
+  bank_account_name String
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  properties Property[] /// Seorang tenant bisa punya banyak properti
+
+  @@map("tenants")
 }
 
-
+/// Data properti yang disewakan tenant.
 model Property {
-  id          Int     @id @default(autoincrement())
+  id          String @id @default(uuid())
+  tenant      Tenant @relation(fields: [tenant_id], references: [id])
+  tenant_id   String /// FK -> Tenant
   name        String
   description String
-  location    Location
-  category    PropertyCategory
-  mainImage   String?
-  createdAt   DateTime   @default(now())
+  address     String
+  city        String
 
-  tenant      User       @relation("TenantProperties", fields: [tenantId], references: [id])
-  tenantId    Int
+  /// Memecah `point` menjadi latitude dan longitude untuk kemudahan penggunaan
+  latitude  Float
+  longitude Float
 
-  rooms       Room[]
-  reviews     Review[]   @relation("PropertyReviews")
+  category   PropertyCategory
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+
+  images     PropertyImage[]
+  rooms      Room[]
+  facilities PropertyFacility[]
+  reviews    Review[]
+
+  @@map("properties")
 }
 
-enum PropertyCategory {
-  VILLA
-  APARTMENT
-  HOMESTAY
+/// Galeri gambar untuk properti.
+model PropertyImage {
+  id          String   @id @default(uuid())
+  property    Property @relation(fields: [property_id], references: [id], onDelete: Cascade)
+  property_id String /// FK -> Property
+  image_url   String
+  created_at  DateTime @default(now())
+
+  @@map("property_images")
 }
 
-enum Location {
-  BALI
-  JAKARTA
-  SURABAYA
-  BANDUNG
-  YOGYAKARTA
-  MALANG
-}
-
+/// Data tiap kamar dalam suatu properti.
 model Room {
-  id            Int             @id @default(autoincrement())
-  name          String
-  description   String?
-  basePrice     String
-  capacity      Int
-  picture       String?
+  id          String   @id @default(uuid())
+  property    Property @relation(fields: [property_id], references: [id], onDelete: Cascade)
+  property_id String /// FK -> Property
+  name        String
+  base_price  Int
+  max_guest   Int
+  created_at  DateTime @default(now())
 
-  property      Property           @relation(fields: [propertyId], references: [id])
-  propertyId    Int
-
+  images         RoomImage[]
   availabilities RoomAvailability[]
-  bookings      Booking[]
+  peakPrices     PeakPrice[]
+  bookings       Booking[]
+
+  @@map("rooms")
 }
 
+/// Gambar tiap room.
+model RoomImage {
+  id         String   @id @default(uuid())
+  room       Room     @relation(fields: [room_id], references: [id], onDelete: Cascade)
+  room_id    String /// FK -> Room
+  image_url  String
+  created_at DateTime @default(now())
+
+  @@map("room_images")
+}
+
+/// Master fasilitas (AC, Wifi, Pool, dll).
+model Facility {
+  id   String @id @default(uuid())
+  name String @unique
+
+  properties PropertyFacility[]
+
+  @@map("facilities")
+}
+
+/// Tabel penghubung (pivot) fasilitas untuk properti (Many-to-Many).
+model PropertyFacility {
+  property    Property @relation(fields: [property_id], references: [id], onDelete: Cascade)
+  property_id String /// FK -> Property
+  facility    Facility @relation(fields: [facility_id], references: [id], onDelete: Cascade)
+  facility_id String /// FK -> Facility
+
+  @@id([property_id, facility_id]) /// Composite primary key
+  @@map("property_facilities")
+}
+
+/// Ketersediaan room di tanggal tertentu.
 model RoomAvailability {
-  id            Int   @id @default(autoincrement())
-  room          Room     @relation(fields: [roomId], references: [id])
-  roomId        Int
-  date          DateTime
-  isAvailable   Boolean  @default(true)
-  priceOverride String?
+  id           String   @id @default(uuid())
+  room         Room     @relation(fields: [room_id], references: [id], onDelete: Cascade)
+  room_id      String /// FK -> Room
+  date         DateTime @db.Date
+  is_available Boolean  @default(true)
+  created_at   DateTime @default(now())
+
+  @@unique([room_id, date]) /// Setiap kamar hanya punya satu status ketersediaan per tanggal
+  @@map("room_availabilities")
 }
 
-model PeakSeasonRate {
-  id              Int   @id @default(autoincrement())
-  tenant          User     @relation("TenantPeakRates", fields: [tenantId], references: [id])
-  tenantId        Int
-  date            DateTime
-  adjustmentType  AdjustmentType
-  adjustmentValue String
+/// Harga khusus (puncak) di tanggal tertentu.
+model PeakPrice {
+  id         String        @id @default(uuid())
+  room       Room          @relation(fields: [room_id], references: [id], onDelete: Cascade)
+  room_id    String /// FK -> Room
+  date       DateTime      @db.Date
+  type       PeakPriceType
+  amount     Int
+  created_at DateTime      @default(now())
+
+  @@unique([room_id, date]) /// Setiap kamar hanya punya satu harga puncak per tanggal
+  @@map("peak_prices")
 }
 
+/// Data pemesanan oleh user.
 model Booking {
-  id             Int    @id @default(autoincrement())
-  user           User      @relation(fields: [userId], references: [id])
-  userId         Int
-  room           Room      @relation(fields: [roomId], references: [id])
-  roomId         Int
+  id             String        @id @default(uuid())
+  user           User          @relation(fields: [user_id], references: [id])
+  user_id        String /// FK -> User
+  room           Room          @relation(fields: [room_id], references: [id])
+  room_id        String /// FK -> Room
+  check_in       DateTime      @db.Date
+  check_out      DateTime      @db.Date
+  guest_adults   Int
+  guest_children Int
+  full_name      String
+  email          String
+  phone          String
+  status         BookingStatus @default(PENDING_PAYMENT)
+  payment_method PaymentMethod
 
-  startDate      DateTime
-  endDate        DateTime
-  totalPrice     String
-  status         BookingStatus @default(MENUNGGU_PEMBAYARAN)
-  paymentProofUrl String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  /// Kolom untuk batas waktu pembayaran
+  expires_at DateTime?
 
-  review         Review?   @relation("BookingReview")
+  created_at DateTime @default(now())
+
+  payment Payment? /// Relasi one-to-one dengan Payment
+  review  Review? /// Relasi one-to-one dengan Review
+
+  @@map("bookings")
 }
 
+/// Detail pembayaran dari booking.
+model Payment {
+  id                String   @id @default(uuid())
+  booking           Booking  @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  booking_id        String   @unique /// FK -> Booking (satu booking, satu pembayaran)
+  amount            Int
+  payment_proof_url String? /// Opsional, hanya untuk manual
+  paid_at           DateTime
+  created_at        DateTime @default(now())
+
+  @@map("payments")
+}
+
+/// Review oleh user, satu kali per booking.
 model Review {
-  id         Int   @id @default(autoincrement())
-  comment    String
-  createdAt  DateTime @default(now())
+  id           String   @id @default(uuid())
+  booking      Booking  @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  booking_id   String   @unique /// FK -> Booking (satu booking, satu review)
+  user         User     @relation(fields: [user_id], references: [id])
+  user_id      String /// FK -> User
+  property     Property @relation(fields: [property_id], references: [id])
+  property_id  String /// FK -> Property
+  rating       Int
+  comment      String
+  tenant_reply String? /// Opsional
+  created_at   DateTime @default(now())
 
-  user       User     @relation("UserReviews", fields: [userId], references: [id])
-  userId     Int
-
-  booking    Booking? @relation("BookingReview", fields: [bookingId], references: [id])
-  bookingId  Int? @unique
-
-  property   Property  @relation("PropertyReviews", fields: [propertyId], references: [id])
-  propertyId Int
-
-  parent     Review?   @relation("ReplyToReview", fields: [parentId], references: [id])
-  parentId   Int?
-
-  replies    Review[]  @relation("ReplyToReview")
-  tenant     User?     @relation("TenantReplies", fields: [tenantId], references: [id])
-  tenantId   Int?
+  @@map("reviews")
 }
 
-model UserToken {
-  id        Int    @id @default(autoincrement())
-  token     String    @unique
-  type      TokenType
-  user      User      @relation(fields: [userId], references: [id])
-  userId    Int
-  expiresAt DateTime
-  isUsed    Boolean   @default(false)
-  createdAt DateTime  @default(now())
+/// =======================================================
+/// TABEL BARU UNTUK FITUR TAMBAHAN
+/// =======================================================
+
+/// Token reset password (email login only).
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String
+  token      String   @unique
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  @@map("password_reset_tokens")
+}
+
+/// Token untuk verifikasi email saat registrasi atau ganti email.
+model EmailVerificationToken {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String
+  token      String   @unique
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  @@map("email_verification_tokens")
+}
+
+/// Token untuk registrasi 2-langkah.
+model RegistrationToken {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id String @unique // Foreign key ke User. Unik agar 1 user hanya punya 1 token registrasi.
+
+  @@map("registration_tokens")
 }

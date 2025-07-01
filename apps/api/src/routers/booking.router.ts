@@ -11,12 +11,11 @@ export class BookingRouter {
   }
 
   private setRoutes(): void {
-    this.router.post('/bookings', this.controller.create.bind(this.controller));
-    this.router.get('/bookings/user/:userId', this.controller.findAllByUser.bind(this.controller));
-    this.router.get('/bookings/:id', this.controller.findById.bind(this.controller));
-    this.router.put('/bookings/:id', this.controller.update.bind(this.controller));
-    this.router.put('/bookings/:id/payment-status', this.controller.updatePaymentStatus.bind(this.controller));
-    this.router.delete('/bookings/:id', this.controller.delete.bind(this.controller));
+    this.router.post('/bookings', this.controller.createBooking.bind(this.controller));
+    this.router.get('/bookings/:id', this.controller.findBookingById.bind(this.controller));
+    this.router.get('/bookings', this.controller.findAllBooking.bind(this.controller));
+    this.router.put('/bookings/:id', this.controller.updateBookingStatus.bind(this.controller));
+    this.router.delete('/bookings/:id', this.controller.deleteBooking.bind(this.controller));
   }
 
   public getRouter(): Router {

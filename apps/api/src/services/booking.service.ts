@@ -1,50 +1,50 @@
-import { prisma } from '@/lib/prisma';
-import { BookingStatus } from '@prisma/client';
-import {
-  IBookingService,
-  IBookingCreateInput,
-  IBookingUpdateInput,
-} from '@/models/booking.interface';
+import { prisma } from '@/prisma/client';
+import { CreateBookingInput, UpdateBookingInput } from '@/types/booking.types';
 
-export class BookingService implements IBookingService {
-  public async create(data: IBookingCreateInput) {
-    return prisma.booking.create({
+export class BookingService {
+  public async createBooking(data: CreateBookingInput) {
+    return await prisma.booking.create({
       data: {
-        ...data,
-        status: BookingStatus.MENUNGGU_PEMBAYARAN,
+        user: { connect: { id: data.user_id } },
+        room: { connect: { id: data.room_id } },
+        check_in: new Date(data.check_in),
+        check_out: new Date(data.check_out),
+        guest_adults: data.guest_adults,
+        guest_children: data.guest_children,
+        full_name: data.full_name,
+        email: data.email,
+        phone: data.phone,
+        payment_method: data.payment_method,
+        // Optional, tambahkan status atau expires_at kalau perlu
       },
-    });
-  }
-
-  public async findAllByUser(userId: number) {
-    return prisma.booking.findMany({
-      where: { userId },
       include: {
+        user: true,
         room: true,
       },
-      orderBy: { createdAt: 'desc' },
     });
   }
 
-  public async findById(id: number) {
-    return prisma.booking.findUnique({
+  public async findAllBooking() {
+    return await prisma.booking.findMany({
+      include: { user: true, room: true },
+    });
+  }
+
+  public async findBookingById(id: string) {
+    return await prisma.booking.findUnique({
       where: { id },
-      include: {
-        room: true,
-      },
+      include: { user: true, room: true },
     });
   }
 
-  public async update(id: number, data: IBookingUpdateInput) {
-    return prisma.booking.update({
+  public async updateBookingStatus(id: string, data: UpdateBookingInput) {
+    return await prisma.booking.update({
       where: { id },
       data,
     });
   }
 
-  public async delete(id: number) {
-    await prisma.booking.delete({
-      where: { id },
-    });
+  public async deleteBooking(id: string) {
+    return await prisma.booking.delete({ where: { id } });
   }
 }
