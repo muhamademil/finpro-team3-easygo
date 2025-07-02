@@ -8,7 +8,10 @@ export class BookingController {
     try {
       const data = req.body;
       const booking = await service.createBooking(data);
-      res.status(201).json(booking);
+      res.status(201).json({
+        message: 'Booking created successfully',
+        data: booking,
+      });
     } catch (err) {
       res.status(500).json({ message: 'Failed to create booking', error: err });
     }
@@ -53,6 +56,4 @@ export class BookingController {
       res.status(500).json({ message: 'Failed to delete booking', error: err });
     }
   }
-
-  
 }
