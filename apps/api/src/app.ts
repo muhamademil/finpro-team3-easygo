@@ -1,19 +1,20 @@
-// import express, {
-//   json,
-//   urlencoded,
-//   Express,
-//   Request,
-//   Response,
-//   NextFunction,
-//   Router,
-// } from 'express';
-// import cors from 'cors';
-// import CONFIG from './config';
-// import { AuthRouter } from './routers/auth.router';
+import express, {
+  json,
+  urlencoded,
+  Express,
+  Request,
+  Response,
+  NextFunction,
+  Router,
+} from 'express';
+import cors from 'cors';
+import CONFIG from './config';
+import { AuthRouter } from './routers/auth.router';
+import { BookingRouter } from './routers/booking.router';
+import { RoomRouter } from './routers/room.router';
 // import passport from 'passport';
 // import session from 'express-session';
-// import { PropertyRouter } from './routers/property.router';
-// // import { configurePassport } from './lib/config/passport.config';
+// import { configurePassport } from './lib/config/passport.config';
 
 // export default class App {
 //   private app: Express;
@@ -67,14 +68,15 @@
 //     );
 //   }
 
-//   private routes(): void {
-//     const authRouter = new AuthRouter();
-//     const propertyRouter = new PropertyRouter();
+  private routes(): void {
+    const authRouter = new AuthRouter();
+    const bookingRouter = new BookingRouter();
+    const roomRouter = new RoomRouter();
 
-//     this.app.use('/api/auth', authRouter.getRouter());
-//     this.app.use('/api/properties', propertyRouter.getRouter());
-//     this.app.use('/api/uploads', uploadRouter.getRouter());
-//   }
+    this.app.use('/api/auth', authRouter.getRouter());
+    this.app.use('/api', bookingRouter.getRouter());
+    this.app.use('/api', roomRouter.getRouter());
+  }
 
 //   public start(): void {
 //     this.app.listen(CONFIG.PORT, () => {
