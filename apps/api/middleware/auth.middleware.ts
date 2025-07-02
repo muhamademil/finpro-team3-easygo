@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import CONFIG from '@/config';
 import { ResponseError } from '@/error/response.error';
 
-// Definisi untuk payload yang kita simpan di JWT
 interface TokenPayload {
   id: string;
   role: string;
@@ -27,12 +26,7 @@ export const authMiddleware = (
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next(
-      new ResponseError(
-        401,
-        'Unauthorized: Token tidak tersedia atau format salah',
-      ),
-    );
+    return next(new ResponseError(401, 'Unauthorized: Token tidak tersedia'));
   }
 
   const token = authHeader.split(' ')[1];

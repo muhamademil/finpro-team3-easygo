@@ -9,7 +9,7 @@ export class UploadController {
       const signatureData = this.uploadService.getUploadSignature();
 
       res.status(200).json({
-        message: 'Signature generated successfully',
+        message: 'Signature generated has been successfully',
         data: signatureData,
       });
     } catch (error) {
