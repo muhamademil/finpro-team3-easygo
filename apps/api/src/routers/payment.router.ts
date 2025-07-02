@@ -1,10 +1,45 @@
-// import { Router } from "express";
-// import { PaymentController } from "@/controllers/payment.controller";
+import { Router } from 'express';
+import { PaymentController } from '@/controllers/payment.controller';
+import { MidtransController } from '@/controllers/midtrans.controller';
 
-// const router = Router();
-// const controller = new PaymentController();
+export class PaymentRouter {
+  private router = Router();
+  private controller = new PaymentController();
+  private midtransController = new MidtransController();
 
-// router.post('/payment/snap', controller.createSnapTransaction);
-// router.post('/payment/core', controller.chargeWithCore);
+  constructor() {
+    this.setRoutes();
+  }
 
-// export default router;
+  private setRoutes(): void {
+    this.router.post(
+      '/payments',
+      this.controller.createPayment.bind(this.controller),
+    );
+    this.router.get(
+      '/payments',
+      this.controller.getAllPayments.bind(this.controller),
+    );
+    this.router.get(
+      '/payments/:id',
+      this.controller.getPaymentById.bind(this.controller),
+    );
+    this.router.delete(
+      '/payments/:id',
+      this.controller.deletePayment.bind(this.controller),
+    );
+
+    this.router.post(
+      '/payments/snap',
+      this.midtransController.createSnapTransaction.bind(this.midtransController),
+    );
+    this.router.post(
+      '/payments/core',
+      this.midtransController.chargeWithCore.bind(this.midtransController),
+    );
+  }
+
+  public getRouter(): Router {
+    return this.router;
+  }
+}
