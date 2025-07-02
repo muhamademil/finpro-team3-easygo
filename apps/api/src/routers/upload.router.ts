@@ -1,20 +1,24 @@
-// import { UploadController } from "@/controllers/upload.controller";
-// import { Router } from "express";
+import { Router } from 'express';
+import { UploadController } from '../controllers/upload.controller';
+import { tenantMiddleware } from 'middleware/tenant.middleware';
 
-// export class UploadRouter{
-//     private router: Router;
-//     private uploadController: UploadController
+export class UploadRouter {
+  private router: Router;
+  private uploadController: UploadController;
 
-//     constructor(){
-//          this.uploadController = new UploadController();
-//             this.router = Router();
-//             this.initializeRoutes();
-//     }
-//     private initializeRoutes(): void {
-//     this.router.get('/', this.uploadController.getProperties);
-//   }
+  constructor() {
+    this.uploadController = new UploadController();
+    this.router = Router();
+    this.initializeRoutes();
+  }
 
-//   getRouter(): Router {
-//     return this.router;
-//   }
-// }
+  private initializeRoutes(): void {
+    // Endpoint ini akan dapat diakses di GET /api/uploads/signature
+    // dan dilindungi oleh authMiddleware.
+    this.router.get('/signature', this.uploadController.getSignature);
+  }
+
+  getRouter(): Router {
+    return this.router;
+  }
+}

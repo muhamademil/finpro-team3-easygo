@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import nextFontLocal from 'next/font/local';
-import { MainLayout } from '@/components/Layouts/MainLayout';
 
 const satoshi = nextFontLocal({
   src: [
@@ -92,9 +91,7 @@ export default function RootLayout({
       lang="en"
       className={`${satoshi.variable} ${clashGrotesk.variable} font-sans`}
     >
-      <body>
-        <MainLayout>{children}</MainLayout>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

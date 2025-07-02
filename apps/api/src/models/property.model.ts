@@ -7,3 +7,22 @@ export interface PropertyQueryParams {
   limit?: string;
   page?: string;
 }
+
+export type RoomInput = {
+  name: string;
+  base_price: number;
+  max_guest: number;
+};
+
+export type CreatePropertyInput = {
+  name: string;
+  description: string;
+  address: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  category: 'VILLA' | 'APARTMENT' | 'GUEST_HOUSE';
+  rooms: RoomInput[];
+  facilityIds: string[];
+  imageUrls: string[];
+};

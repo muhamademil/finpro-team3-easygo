@@ -11,7 +11,11 @@
     "prisma": "npx prisma",
     "migrate:dev": "npx prisma migrate dev",
     "generate:dev": "npx prisma generate dev",
-    "studio": "npx prisma studio"
+    "studio": "npx prisma studio",
+    "seed": "prisma db seed"
+  },
+   "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "author": "",
   "license": "ISC",
@@ -29,7 +33,6 @@
     "jsonwebtoken": "^9.0.2",
     "midtrans-client": "^1.4.3",
     "nodemailer": "^7.0.3",
-    "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-twitter": "^1.0.4",
