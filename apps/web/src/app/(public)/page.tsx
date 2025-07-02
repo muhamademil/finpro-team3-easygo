@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import { HeroSearchForm } from '@/components/Features/Homepage/Sections/HeroSearchForm';
+import { HeroSearchForm } from '@/components/Features/Homepage/Sections/HeroSection';
 import { HorizontalScrollingSection } from '@/components/Features/Homepage/Sections/HorizontalScrollingSection';
 
 import { DestinationCard } from '@/components/Features/Homepage/DestinationCard';
