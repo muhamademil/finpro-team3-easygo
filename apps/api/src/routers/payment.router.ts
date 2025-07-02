@@ -34,8 +34,8 @@ export class PaymentRouter {
       this.midtransController.createSnapTransaction.bind(this.midtransController),
     );
     this.router.post(
-      '/payments/core',
-      this.midtransController.chargeWithCore.bind(this.midtransController),
+      '/payments/snap/:bookingId',
+      this.midtransController.getSnapTransaction.bind(this.midtransController),
     );
   }
 
