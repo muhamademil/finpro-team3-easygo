@@ -1,39 +1,10 @@
-// app/(dashboard)/dashboard/property/page.tsx
-
 import { TenantPropertyCard } from '@/components/Features/Tenant/Property/TenantPropertyCard';
 import Button from '@/components/Elements/Button';
 import Link from 'next/link';
-import type { Property } from '@/lib/type';
+import { getMyPropertiesAPI } from '@/services/tenant.service';
 
-// Data properti dummy milik tenant ini.
-// Nantinya, data ini akan diambil dari database (fetch API).
-const tenantProperties: Property[] = [
-  {
-    id: 1,
-    name: 'Home in Sukajadi',
-    location: 'Bandung, Indonesia',
-    image:
-      'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=400',
-    rating: 4.98,
-    reviews: 72,
-    price: 350000,
-    category: 'House',
-  },
-  {
-    id: 4,
-    name: 'Villa Tepi Tebing',
-    location: 'Bandung, Indonesia',
-    image:
-      'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=400',
-    rating: 4.99,
-    reviews: 112,
-    price: 650000,
-    category: 'Villa',
-  },
-  // Tambahkan properti lainnya milik tenant
-];
-
-export default function TenantPropertyPage() {
+export default async function TenantPropertyPage() {
+  const tenantProperties = await getMyPropertiesAPI();
   return (
     <div>
       {/* Header Halaman */}
@@ -60,7 +31,7 @@ export default function TenantPropertyPage() {
           <p className="text-gray-500 mt-2 mb-6">
             Ayo mulai daftarkan properti pertama Anda!
           </p>
-          <Link href="/new" legacyBehavior>
+          <Link href="/new/1" legacyBehavior>
             <a>
               <Button variant="solid">Buat Listing Pertama</Button>
             </a>

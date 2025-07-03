@@ -1,22 +1,19 @@
-// app/dashboard/layout.tsx
+import { redirect } from 'next/navigation';
+import { getServerSideSession } from '@/lib/session';
 
-import { DashboardHeader } from '@/components/Features/Tenant/Header/DashboardHeader';
-
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Ambil data user di sini jika diperlukan untuk di-pass ke Header
-  const user = {
-    name: 'Narendra House',
-    photoUrl: 'https://i.pravatar.cc/150?u=naren',
-    verified: true,
-  };
+  const session = await getServerSideSession();
+
+  if (!session || session.role !== 'TENANT') {
+    redirect('/login');
+  }
 
   return (
-    <div className="min-h-screen bg-white">
-      <DashboardHeader user={user} />
+    <div className="bg-white min-h-screen">
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">{children}</main>
     </div>
   );

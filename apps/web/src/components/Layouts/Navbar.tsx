@@ -6,13 +6,14 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Button from '@/components/Elements/Button';
 import { ChevronDownIcon } from 'lucide-react';
+import { useAuthStore, User } from '@/stores/useAuth.store';
+import { useRouter } from 'next/navigation';
 
-export const Navbar = ({
-  user,
-}: {
-  user?: { name: string; photoUrl: string; verified: boolean };
-}) => {
+export const Navbar = ({ user }: { user?: User | null }) => {
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const { logout } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +22,11 @@ export const Navbar = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = () => {
+    logout(); // Call action logout from store
+    router.push('/login');
+  };
 
   return (
     <nav
@@ -49,15 +55,21 @@ export const Navbar = ({
         <div className="flex items-center space-x-4">
           {!user ? (
             <>
-              <Button variant="outlined" className="bg-white">
-                Daftar
-              </Button>
-              <Button variant="solid">Masuk</Button>
+              <Link href="/register">
+                <Button variant="outlined" className="bg-white">
+                  Daftar
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button variant="solid">Masuk</Button>
+              </Link>
             </>
           ) : (
             <>
-              {user.verified ? (
-                <span className="text-sm text-gray-700">Hi, {user.name}</span>
+              {user.is_verified ? (
+                <span className="text-sm text-gray-700">
+                  Hi, {user.name || 'User'}
+                </span>
               ) : (
                 <span className="text-sm text-red-600 font-medium">
                   Belum Terverifikasi
@@ -67,8 +79,8 @@ export const Navbar = ({
               <Popover className="relative">
                 <PopoverButton className="flex items-center space-x-2">
                   <Image
-                    src={user.photoUrl}
-                    alt="profile"
+                    src={user.photo_url || 'https://i.pravatar.cc/150'}
+                    alt={user.name || 'profile'}
                     width={36}
                     height={36}
                     className="rounded-full object-cover"
@@ -92,7 +104,10 @@ export const Navbar = ({
                   >
                     My Book
                   </Link>
-                  <button className="w-full text-left text-sm text-red-500 hover:bg-gray-100 rounded px-2 py-1">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left text-sm text-red-500 hover:bg-gray-100 rounded px-2 py-1"
+                  >
                     Logout
                   </button>
                 </PopoverPanel>

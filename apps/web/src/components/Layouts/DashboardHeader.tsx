@@ -1,4 +1,3 @@
-// components/layout/DashboardHeader.tsx
 'use client';
 
 import Image from 'next/image';
@@ -13,7 +12,9 @@ import {
   Transition,
 } from '@headlessui/react';
 import { Fragment } from 'react';
-// Data Navigasi
+import { useAuthStore, User } from '@/stores/useAuth.store';
+import { useRouter } from 'next/navigation';
+
 const navLinks = [
   { href: '/dashboard', label: 'Beranda' },
   { href: '/dashboard/property', label: 'Property' },
@@ -23,27 +24,27 @@ const navLinks = [
   { href: '/dashboard/reviews', label: 'Ulasan' },
 ];
 
-// Tipe data untuk user, mirip seperti di Navbar publik
-type User = {
-  name: string;
-  photoUrl: string;
-  verified: boolean;
-};
+// type User = {
+//   name: string;
+//   photoUrl: string;
+//   verified: boolean;
+// };
 
-export const DashboardHeader = ({
-  user,
-}: {
-  user?: { name: string; photoUrl: string; verified: boolean };
-}) => {
+export const DashboardHeader = ({ user }: { user?: User | null }) => {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // User dummy untuk development
-  const currentUser: User = user || {
-    name: 'Narendra House',
-    photoUrl: 'https://i.pravatar.cc/150?u=narendra',
-    verified: false, // <-- Ganti jadi `true` untuk menghilangkan notifikasi
+  const { logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
   };
+
+  if (!user) {
+    return null; // Next tampilkan skeleton loader
+  }
 
   return (
     <header className="bg-white border-b sticky top-0 z-40">
@@ -80,7 +81,7 @@ export const DashboardHeader = ({
 
         {/* Konten Kanan: Notifikasi & User */}
         <div className="flex items-center gap-4">
-          {!currentUser.verified && (
+          {!user.is_verified && (
             <div className="hidden sm:flex items-center gap-2 bg-red-50 text-red-600 text-xs font-semibold px-3 py-1.5 rounded-full">
               <AlertCircle className="w-4 h-4" />
               <span>Belum Terverifikasi</span>
@@ -89,11 +90,11 @@ export const DashboardHeader = ({
           <Popover className="relative">
             <PopoverButton className="flex items-center gap-2 rounded-full focus:outline-none">
               <span className="hidden sm:inline text-sm font-medium text-gray-700">
-                Hi, {currentUser.name}
+                Hi, {user.name || 'Tenant'}
               </span>
               <Image
-                src={currentUser.photoUrl}
-                alt={currentUser.name}
+                src={user.photo_url || 'https://i.pravatar.cc/150'}
+                alt={user.name || 'profile'}
                 width={36}
                 height={36}
                 className="rounded-full"
@@ -118,7 +119,7 @@ export const DashboardHeader = ({
                     Profile
                   </Link>
                   <button
-                    onClick={() => alert('Logout action!')}
+                    onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                   >
                     Logout

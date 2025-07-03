@@ -31,7 +31,7 @@ export const CreateListingLayout = ({
     currentStep,
     validateAndGoToNextStep,
     prevStep,
-    // submitListing,
+    submitListing,
     isLoading,
   } = useListingStore();
 
@@ -44,9 +44,9 @@ export const CreateListingLayout = ({
         const isValid = validateAndGoToNextStep(); // Pastikan validasi terakhir dijalankan
         if (isValid) {
           try {
-            // const newPropertyResponse = await submitListing();
+            await submitListing();
             alert('Properti berhasil dibuat!');
-            router.push(`dashboard/property}`);
+            router.push(`/dashboard/property`);
           } catch (error) {
             console.error('Gagal membuat properti:', error);
             alert(
