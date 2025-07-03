@@ -185,6 +185,7 @@ export const useListingStore = create<ListingState>((set, get) => ({
 
       // --- Langkah 5: Kirim data final ke API backend ---
       const response = await createPropertyAPI(finalPayload);
+      console.log(response);
 
       set({ isLoading: false });
       return response.data; // Kembalikan data properti yang baru dibuat

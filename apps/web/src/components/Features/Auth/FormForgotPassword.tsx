@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Button from '../../Elements/Button';
 import InputForm from '../../Elements/Input';
 import { forgotPasswordAPI } from '@/services/auth.service';
-import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore } from '@/stores/useAuth.store';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
