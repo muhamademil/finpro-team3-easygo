@@ -1,4 +1,3 @@
-// src/routers/room.router.ts
 import { Router } from 'express';
 import { RoomController } from '@/controllers/room.controller';
 

@@ -12,6 +12,7 @@ import CONFIG from './config';
 import { AuthRouter } from './routers/auth.router';
 import { BookingRouter } from './routers/booking.router';
 import { RoomRouter } from './routers/room.router';
+import { PaymentRouter } from './routers/payment.router';
 // import passport from 'passport';
 // import session from 'express-session';
 // import { configurePassport } from './lib/config/passport.config';
@@ -78,11 +79,17 @@ export default class App {
     const propertyRouter = new PropertyRouter();
     const facilityRouter = new FacilityRouter();
     const uploadRouter = new UploadRouter();
+    const paymentRouter = new PaymentRouter();
+    const bookingRouter = new BookingRouter();
+    const roomRouter = new RoomRouter();
 
     this.app.use('/api/auth', authRouter.getRouter());
     this.app.use('/api/properties', propertyRouter.getRouter());
     this.app.use('/api/facilities', facilityRouter.getRouter());
     this.app.use('/api/uploads', uploadRouter.getRouter());
+    this.app.use('/api', bookingRouter.getRouter());
+    this.app.use('/api', roomRouter.getRouter());
+    this.app.use('/api', paymentRouter.getRouter());
   }
 
   public start(): void {
