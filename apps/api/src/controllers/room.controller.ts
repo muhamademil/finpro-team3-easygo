@@ -26,6 +26,8 @@ export class RoomController {
   }
 
   public async findRoomById(req: Request, res: Response): Promise<void> {
+    console.log('Room ID requested:', req.params.id);
+
     try {
       const room = await this.service.findRoomById(req.params.id);
       if (!room) {

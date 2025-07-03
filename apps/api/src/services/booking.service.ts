@@ -15,7 +15,10 @@ export class BookingService {
         email: data.email,
         phone: data.phone,
         payment_method: data.payment_method,
-        // Optional, tambahkan status atau expires_at kalau perlu
+        expires_at:
+          data.payment_method === 'MANUAL'
+            ? new Date(Date.now() + 2 * 60 * 60 * 1000)
+            : null,
       },
       include: {
         user: true,
@@ -33,7 +36,7 @@ export class BookingService {
   public async findBookingById(id: string) {
     return await prisma.booking.findUnique({
       where: { id },
-      include: { user: true, room: true },
+      include: { user: true, room: true, payment: true },
     });
   }
 
