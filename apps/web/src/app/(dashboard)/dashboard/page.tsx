@@ -1,8 +1,8 @@
-// app/dashboard/page.tsx
+'use client';
 
 import { InfoCard } from '@/components/Features/Tenant/Homepage/InfoCard';
+import { useAuthStore } from '@/stores/useAuth.store';
 
-// Data untuk grid "Tips"
 const tipsData = [
   {
     title: 'Beranda',
@@ -48,16 +48,13 @@ const tipsData = [
 ];
 
 export default function DashboardHomePage() {
-  const tenantName = 'Narendra House'; // Bisa diambil dari data user
-
+  const { user } = useAuthStore();
   return (
     <div>
-      {/* Pesan Selamat Datang */}
-      <h1 className="text-3xl font-bold text-gray-800">
-        Selamat Datang, {tenantName}
+      <h1 className="text-4xl font-medium font-fat text-gray-800">
+        Selamat Datang, {user?.name}
       </h1>
 
-      {/* Seksi Tips */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold">Tips!</h2>
         <p className="text-gray-500 mt-1">

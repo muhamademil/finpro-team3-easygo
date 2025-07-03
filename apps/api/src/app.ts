@@ -19,6 +19,7 @@ import { PropertyRouter } from './routers/property.router';
 import { ResponseError } from './error/response.error';
 import { FacilityRouter } from './routers/facility.router';
 import { UploadRouter } from './routers/upload.router';
+import { TenantRouter } from './routers/tenant.router';
 
 export default class App {
   private app: Express;
@@ -34,19 +35,6 @@ export default class App {
     this.app.use(cors());
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
-
-    // this.app.use(
-    //   session({
-    //     secret: 'your-session-secret', // sebaiknya pindah ke .env juga
-    //     resave: false,
-    //     saveUninitialized: false,
-    //   }),
-    // );
-
-    // this.app.use(passport.initialize());
-    // this.app.use(passport.session());
-
-    // configurePassport();
   }
 
   private handleError(): void {
@@ -78,11 +66,13 @@ export default class App {
     const propertyRouter = new PropertyRouter();
     const facilityRouter = new FacilityRouter();
     const uploadRouter = new UploadRouter();
+    const tenantRouter = new TenantRouter();
 
     this.app.use('/api/auth', authRouter.getRouter());
     this.app.use('/api/properties', propertyRouter.getRouter());
     this.app.use('/api/facilities', facilityRouter.getRouter());
     this.app.use('/api/uploads', uploadRouter.getRouter());
+    this.app.use('/api/tenant', tenantRouter.getRouter());
   }
 
   public start(): void {

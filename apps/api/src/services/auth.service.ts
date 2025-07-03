@@ -203,7 +203,12 @@ export class AuthService {
 
     const secret = CONFIG.JWT_SECRET;
     const token = jwt.sign(payload, secret, { expiresIn: '1d' });
-    return token;
+    const { password: _, ...userWithoutPassword } = user;
+
+    return {
+      token,
+      user: userWithoutPassword,
+    };
   }
 
   public async forgotPassword(request: ForgotPasswordInput) {

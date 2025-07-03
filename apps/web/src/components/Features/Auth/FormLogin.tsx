@@ -7,14 +7,14 @@ import Button from '../../Elements/Button';
 import InputForm from '../../Elements/Input';
 import { SOCIAL_LOGINS } from '@/constants/auth';
 import { loginAPI } from '@/services/auth.service';
-import { useAuthStore } from '@/stores/auth.store';
-import { useRouter } from 'next/navigation';
+import { useAuthStore, User } from '@/stores/useAuth.store';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export const FormLogin = () => {
   const router = useRouter();
-  const { setToken } = useAuthStore();
 
+  const { setToken, setUser } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -27,18 +27,27 @@ export const FormLogin = () => {
 
     try {
       const response = await loginAPI({ email, password });
-      const { token } = response.data.data;
+      const { token, user }: { token: string; user: User } = response.data.data;
+
+      console.log(user);
+      console.log(token);
+      console.log(response);
 
       setToken(token);
+      setUser(user);
 
-      alert('Login Berhasil! Anda akan diarahkan ke halaman utama');
-      router.push('/');
+      alert('Login Berhasil! Anda akan diarahkan...');
+
+      if (user.role === 'TENANT') {
+        router.push('/dashboard');
+      } else {
+        router.push('/');
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(error.response?.data?.message || 'Email atau password salah.');
       } else {
         setError('Terjadi kesalahan yang tidak terduga. Silakan coba lagi.');
-        console.error('An unexpected error occurred:', error);
       }
     } finally {
       setIsLoading(false);
@@ -96,7 +105,6 @@ export const FormLogin = () => {
         >
           {' '}
           {isLoading ? 'Memproses...' : 'Masuk'}
-          Masuk
         </Button>
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
@@ -106,7 +114,7 @@ export const FormLogin = () => {
             variant="outlined"
             className="w-full mt-4 font-fat font-medium"
           >
-            Daftar
+            <span className="text-primary-blue">Daftar</span>
           </Button>
         </Link>
       </form>

@@ -1,5 +1,8 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   MapPin,
   Clock,
@@ -12,7 +15,18 @@ import { aboutLinks } from '@/constants/footer';
 import { tenantLinks } from '@/constants/footer';
 import { paymentLogos } from '@/constants/footer';
 
+const HIDDEN_FOOTER_PATHS = ['/dashboard', '/login', '/register', '/new'];
+
 export const Footer: React.FC = () => {
+  const pathname = usePathname();
+
+  const isHidden = HIDDEN_FOOTER_PATHS.some((path) =>
+    pathname.startsWith(path),
+  );
+
+  if (isHidden) {
+    return null;
+  }
   return (
     <footer className="bg-white border-t">
       <div className="container mx-auto px-4 py-12 sm:px-10">
@@ -162,7 +176,7 @@ export const Footer: React.FC = () => {
       <div className="border-t mt-12">
         <div className="container mx-auto px-4 py-6 text-center">
           <p className="text-sm text-gray-500">
-            Copyright © 2025 EasyGo. All rights reserved
+            &copy; {new Date().getFullYear()} EasyGo. All rights reserved.
           </p>
         </div>
       </div>

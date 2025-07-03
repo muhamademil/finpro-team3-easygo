@@ -4,16 +4,20 @@ export type Destination = {
   image: string;
 };
 
-export type Property = {
+export interface Property {
   id: number;
   name: string;
-  location: string;
-  image: string;
-  rating: number;
+  address: string;
+  images: ImageType[];
+  rating: number | null;
   reviews: number;
-  price: number;
+  lowest_price: number;
   category: 'Villa' | 'Apartment' | 'House';
-};
+}
+
+interface ImageType {
+  image_url: string;
+}
 
 export type Category = {
   id: number;
