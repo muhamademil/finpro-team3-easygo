@@ -1,9 +1,29 @@
 import { prisma } from '@/prisma/client';
 import { CreatePaymentInput } from '@/types/payment.types';
+import { BookingStatus } from '@prisma/client';
 
 export class PaymentService {
   public async createPayment(data: CreatePaymentInput) {
-    return await prisma.payment.create({ data });
+
+    const [payment] = await prisma.$transaction([
+      prisma.payment.create({
+        data: {
+          booking_id: data.booking_id,
+          amount: data.amount,
+          payment_proof_url: data.payment_proof_url,
+          paid_at: new Date(),
+        },
+      }),
+      prisma.booking.update({
+        where: { id: data.booking_id },
+        data: {
+          status: BookingStatus.PENDING_CONFIRMATION,
+          expires_at: null,
+        },
+      }),
+    ]);
+
+    return payment;
   }
 
   public async getAllPayments() {
