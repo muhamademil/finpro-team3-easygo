@@ -69,14 +69,14 @@ export class AuthController {
   public login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
-      const token = await this.authService.login({
+      const result = await this.authService.login({
         email,
         password,
       });
 
       res.status(200).json({
         message: 'Login berhasil',
-        data: { token },
+        data: result,
       });
     } catch (error) {
       next(error);
