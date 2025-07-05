@@ -94,7 +94,7 @@ export default function ManualPaymentPage() {
       });
 
       alert('Pembayaran berhasil dikirim');
-      router.push('/myBooking'); //ubah dengan masuk ke halaman dashboard atau riwayat pembayaran
+      router.push('/dashboard/booking/my-booking'); //ubah dengan masuk ke halaman dashboard atau riwayat pembayaran
     } catch (err) {
       console.error(err);
       alert('Gagal melakukan pembayaran');

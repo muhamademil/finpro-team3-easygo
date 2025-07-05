@@ -1,52 +1,112 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import api from '@/lib/axios';
 import { createBooking } from '@/api/booking.service';
 import { CreateBookingInput } from '@/types/booking.types';
 import { getRoomById } from '@/api/room.service';
+import { RoomType } from '@/types/room.types';
+import { getClientSession } from '@/lib/session-client';
 
 export default function BookingConfirmationPage() {
-  const { roomId } = useParams();
+  const params = useParams();
+  const roomId = Array.isArray(params.roomId)
+    ? params.roomId[0]
+    : params.roomId;
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  console.log('roomId:', roomId);
-
-  const [room, setRoom] = useState<any>(null);
+  const [room, setRoom] = useState<RoomType | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState<CreateBookingInput>({
-    user_id: 'user-7-uuid', // dari context auth / sementara hardcode
-    room_id: roomId as string,
-    check_in: '2025-09-13',
-    check_out: '2025-09-15',
-    guest_adults: 1,
-    guest_children: 1,
+    user_id: '',
+    room_id: '',
+    check_in: searchParams.get('check_in') || '2025-09-13',
+    check_out: searchParams.get('check_out') || '2025-09-15',
+    guest_adults: Number(searchParams.get('guest_adults')) || 1,
+    guest_children: Number(searchParams.get('guest_children')) || 0,
     full_name: '',
     email: '',
     phone: '',
     payment_method: 'MIDTRANS',
   });
 
+  // const [form, setForm] = useState<CreateBookingInput>({
+  //   user_id: '08db47d4-6dd4-420d-a4e3-61dd9fcc2c56', // dari context auth / sementara hardcode
+  //   room_id: roomId as string,
+  //   check_in: '2025-09-13',
+  //   check_out: '2025-09-15',
+  //   guest_adults: 1,
+  //   guest_children: 1,
+  //   full_name: '',
+  //   email: '',
+  //   phone: '',
+  //   payment_method: 'MIDTRANS',
+  // });
+
   useEffect(() => {
-    const fetchRoom = async () => {
+    const fetchData = async () => {
+      const session = getClientSession();
+      if (!session || session.role !== 'TRAVELLER') {
+        router.push('/login');
+        return;
+      }
+
       try {
-        if (!roomId) {
-          console.warn('Room ID not found in params');
-          return;
-        }
-        const res = await getRoomById(roomId as string);
-        setRoom(res);
+        const roomData = await getRoomById(roomId as string);
+        console.log('roomId sent to API:', roomId); // Harus UUID
+
+        setRoom(roomData);
+        setForm((prev) => ({
+          ...prev,
+          user_id: session.id,
+          room_id: roomData.id,
+        }));
       } catch (error) {
-        console.error('Failed to fetch room:', error);
+        console.error('Room not found:', error);
+        setRoom(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRoom();
+    fetchData();
+  }, [roomId]);
+
+  // useEffect(() => {
+  //   const fetchRoom = async () => {
+  //     try {
+  //       if (!roomId) {
+  //         console.warn('Room ID not found in params');
+  //         return;
+  //       }
+  //       const res = await getRoomById(roomId as string);
+  //       setRoom(res);
+  //     } catch (error) {
+  //       console.error('Failed to fetch room:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchRoom();
+  // }, [roomId]);
+
+  useEffect(() => {
+    const session = getClientSession();
+    if (session?.role === 'TRAVELLER') {
+      setForm((prev) => ({
+        ...prev,
+        user_id: session.id,
+        room_id: roomId as string,
+      }));
+    } else {
+      alert('Unauthorized: Only TRAVELLER can book');
+      router.push('/login');
+    }
   }, [roomId]);
 
   const handleChange = (
@@ -58,7 +118,7 @@ export default function BookingConfirmationPage() {
 
   const handleSubmit = async () => {
     if (!form.full_name || !form.email || !form.phone) {
-      alert('Please complete all personal information');
+      alert('Please complete all required fields.');
       return;
     }
 
@@ -75,13 +135,40 @@ export default function BookingConfirmationPage() {
       } else {
         router.push(`/payment/${booking.id}`);
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Booking failed:', err);
       alert('Booking failed. Please try again.');
-      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // const handleSubmit = async () => {
+  //   if (!form.full_name || !form.email || !form.phone) {
+  //     alert('Please complete all personal information');
+  //     return;
+  //   }
+
+  //   setIsSubmitting(true);
+
+  //   try {
+  //     const booking = await createBooking(form);
+  //     if (form.payment_method === 'MIDTRANS') {
+  //       const res = await api.post('/payments/snap', {
+  //         bookingId: booking.id,
+  //       });
+  //       const { redirectUrl } = res.data;
+  //       window.location.href = redirectUrl;
+  //     } else {
+  //       router.push(`/payment/${booking.id}`);
+  //     }
+  //   } catch (error) {
+  //     alert('Booking failed. Please try again.');
+  //     console.error(error);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   if (loading) {
     return (

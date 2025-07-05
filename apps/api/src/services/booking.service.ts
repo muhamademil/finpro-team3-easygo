@@ -85,16 +85,14 @@ export class BookingService {
           select: {
             id: true,
             name: true,
+            images: {
+              select: { image_url: true },
+            },
             property: {
               select: {
                 id: true,
                 name: true,
                 city: true,
-                images: {
-                  select: {
-                    image_url: true,
-                  },
-                },
               },
             },
           },

@@ -60,6 +60,7 @@ export class BookingController {
 
   public async findMyBookings(req: Request, res: Response) {
     try {
+      // const userId = 'user-5-uuid'; // semerntara hardcode user ID
       const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({ message: 'Unauthorized' });
