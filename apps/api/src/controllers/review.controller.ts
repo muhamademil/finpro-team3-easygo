@@ -2,45 +2,47 @@ import { Request, Response } from 'express';
 import { ReviewService } from '../services/review.service';
 
 export class ReviewController {
-  private reviewService = new ReviewService();
+  private service = new ReviewService();
 
   public createReview = async (req: Request, res: Response) => {
     try {
-      const newReview = await this.reviewService.createReview(req.body);
-      res.status(201).json(newReview);
-    } catch (err) {
-      res.status(500).json({ message: 'Failed to create review', error: err });
+      const userId = req.body.userId; // Atau ambil dari token JWT
+      const { bookingId, propertyId, rating, comment } = req.body;
+
+      const review = await this.service.createReview({
+        bookingId,
+        userId,
+        propertyId,
+        rating,
+        comment,
+      });
+
+      res.status(201).json({ message: 'Review created', data: review });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   };
 
   public getReviewByBookingId = async (req: Request, res: Response) => {
     try {
-      const review = await this.reviewService.getReviewByBookingId(req.params.booking_id);
-      if (!review) return res.status(404).json({ message: 'Review not found' });
+      const { bookingId } = req.params;
+      const review = await this.service.getReviewByBookingId(bookingId);
+      if (!review) {
+        return res.status(404).json({ message: 'Review not found' });
+      }
       res.json(review);
-    } catch (err) {
-      res.status(500).json({ message: 'Failed to fetch review', error: err });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   };
 
   public getReviewsByPropertyId = async (req: Request, res: Response) => {
     try {
-      const reviews = await this.reviewService.getReviewsByPropertyId(req.params.property_id);
+      const { propertyId } = req.params;
+      const reviews = await this.service.getReviewsByPropertyId(propertyId);
       res.json(reviews);
-    } catch (err) {
-      res.status(500).json({ message: 'Failed to fetch reviews', error: err });
-    }
-  };
-
-  public replyToReview = async (req: Request, res: Response) => {
-    try {
-      const { review_id } = req.params;
-      const { tenant_reply } = req.body;
-
-      const updated = await this.reviewService.replyToReview(review_id, tenant_reply);
-      res.json(updated);
-    } catch (err) {
-      res.status(500).json({ message: 'Failed to reply to review', error: err });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   };
 }

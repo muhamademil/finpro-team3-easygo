@@ -4,7 +4,6 @@ import { BookingStatus } from '@prisma/client';
 
 export class PaymentService {
   public async createPayment(data: CreatePaymentInput) {
-
     const [payment] = await prisma.$transaction([
       prisma.payment.create({
         data: {
@@ -34,6 +33,28 @@ export class PaymentService {
     return await prisma.payment.findUnique({
       where: { id },
       include: { booking: true },
+    });
+  }
+
+  public async confirmManualPayment(bookingId: string) {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { payment: true },
+    });
+
+    if (!booking) throw new Error('Booking not found');
+    if (!booking.payment) throw new Error('No payment found');
+    if (booking.status !== BookingStatus.PENDING_CONFIRMATION) {
+      throw new Error('Booking not awaiting confirmation');
+    }
+
+    return await prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        // status: BookingStatus.COMPLETED,
+        status: 'PENDING_CONFIRMATION',
+        payment_method: 'MANUAL',
+      },
     });
   }
 

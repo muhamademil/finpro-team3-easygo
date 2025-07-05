@@ -28,14 +28,24 @@ export class PaymentRouter {
       '/payments/:id',
       this.controller.deletePayment.bind(this.controller),
     );
+    this.router.post(
+      '/payments/midtrans-webhook',
+      this.midtransController.handleWebhook.bind(this.midtransController),
+    );
 
     this.router.post(
       '/payments/snap',
-      this.midtransController.createSnapTransaction.bind(this.midtransController),
+      this.midtransController.createSnapTransaction.bind(
+        this.midtransController,
+      ),
     );
     this.router.post(
       '/payments/snap/:bookingId',
       this.midtransController.getSnapTransaction.bind(this.midtransController),
+    );
+    this.router.patch(
+      '/payments/confirm/:bookingId',
+      this.controller.confirmManualPayment.bind(this.controller),
     );
   }
 

@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { Prisma, PropertyCategory } from '@prisma/client';
-import { PropertyQueryParams } from '@/models/property.model'; // Impor tipe baru kita
+import { PropertyQueryParams } from '@/models/property.model';
 import { Validation } from '@/validation/validation';
 import { PropertyValidation } from '@/validation/property-validation';
 import { ResponseError } from '@/error/response.error';
