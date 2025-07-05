@@ -36,7 +36,37 @@ export class BookingService {
   public async findBookingById(id: string) {
     return await prisma.booking.findUnique({
       where: { id },
-      include: { user: true, room: true, payment: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        room: {
+          select: {
+            id: true,
+            name: true,
+            base_price: true,
+            property: {
+              select: {
+                id: true,
+                name: true,
+                address: true,
+                city: true,
+                images: {
+                  select: {
+                    image_url: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        review: true,
+        payment: true,
+      },
     });
   }
 
@@ -44,6 +74,37 @@ export class BookingService {
     return await prisma.booking.update({
       where: { id },
       data,
+    });
+  }
+
+  public async findBookingsByUserId(userId: string) {
+    return await prisma.booking.findMany({
+      where: { user_id: userId },
+      include: {
+        room: {
+          select: {
+            id: true,
+            name: true,
+            property: {
+              select: {
+                id: true,
+                name: true,
+                city: true,
+                images: {
+                  select: {
+                    image_url: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        review: true,
+        payment: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
     });
   }
 

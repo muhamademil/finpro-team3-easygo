@@ -6,6 +6,7 @@ export class ReviewController {
 
   public createReview = async (req: Request, res: Response) => {
     try {
+      // const userId = req.user?.id; --> jika sudah ada middleware auth
       const userId = req.body.userId; // Atau ambil dari token JWT
       const { bookingId, propertyId, rating, comment } = req.body;
 
@@ -45,4 +46,15 @@ export class ReviewController {
       res.status(500).json({ message: error.message });
     }
   };
+
+  public async deleteReviews(req: Request, res: Response) {
+      try {
+        const { id } = req.params;
+        await this.service.deleteReviews(id);
+
+        res.json({ message: 'Review deleted' });
+      } catch (err) {
+        res.status(500).json({ message: 'Failed to delete review', error: err });
+      }
+    }
 }

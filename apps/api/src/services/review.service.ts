@@ -47,4 +47,8 @@ export class ReviewService {
       },
     });
   }
+
+  public async deleteReviews(id: string) {
+    return await prisma.review.delete({ where: { id } });
+  }
 }

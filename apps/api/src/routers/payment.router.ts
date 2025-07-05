@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { PaymentController } from '@/controllers/payment.controller';
 import { MidtransController } from '@/controllers/midtrans.controller';
+import { authMiddleware } from 'middleware/auth.middleware';
+import { tenantMiddleware } from 'middleware/tenant.middleware';
 
 export class PaymentRouter {
   private router = Router();

@@ -18,10 +18,10 @@ export default function BookingConfirmationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState<CreateBookingInput>({
-    user_id: 'user-4-uuid', // dari context auth / sementara hardcode
+    user_id: 'user-7-uuid', // dari context auth / sementara hardcode
     room_id: roomId as string,
-    check_in: '2025-09-10',
-    check_out: '2025-09-12',
+    check_in: '2025-09-13',
+    check_out: '2025-09-15',
     guest_adults: 1,
     guest_children: 1,
     full_name: '',

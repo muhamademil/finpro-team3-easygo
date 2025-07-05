@@ -30,10 +30,21 @@ export class BookingController {
     try {
       const { id } = req.params;
       const booking = await service.findBookingById(id);
-      if (!booking) return res.status(404).json({ message: 'Not found' });
-      res.json(booking);
+
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // 🔐 Validasi jika user login (TRAVELLER) hanya bisa akses miliknya
+      if (req.user?.role === 'TRAVELLER' && req.user.id !== booking.user.id) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      return res.json(booking);
     } catch (err) {
-      res.status(500).json({ message: 'Failed to fetch booking', error: err });
+      return res
+        .status(500)
+        .json({ message: 'Failed to fetch booking', error: err });
     }
   }
 
@@ -44,6 +55,22 @@ export class BookingController {
       res.json(booking);
     } catch (err) {
       res.status(500).json({ message: 'Failed to update booking', error: err });
+    }
+  }
+
+  public async findMyBookings(req: Request, res: Response) {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const bookings = await service.findBookingsByUserId(userId);
+      return res.json(bookings);
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: 'Failed to fetch user bookings', error: err });
     }
   }
 

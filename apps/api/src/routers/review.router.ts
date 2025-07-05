@@ -14,6 +14,7 @@ export class ReviewRouter {
     this.router.post('/reviews', this.controller.createReview.bind(this.controller));
     this.router.get('/reviews/booking/:bookingId', this.controller.getReviewByBookingId.bind(this.controller));
     this.router.get('/reviews/property/:propertyId', this.controller.getReviewsByPropertyId.bind(this.controller));
+    this.router.delete('/reviews/:id', this.controller.deleteReviews.bind(this.controller));
     // this.router.put('/reviews/:reviewId/reply', this.controller.replyToReview.bind(this.controller));
   }
 
