@@ -52,7 +52,7 @@ export class PaymentService {
       where: { id: bookingId },
       data: {
         // status: BookingStatus.COMPLETED,
-        status: 'PENDING_CONFIRMATION',
+        status: BookingStatus.COMPLETED,
         payment_method: 'MANUAL',
       },
     });

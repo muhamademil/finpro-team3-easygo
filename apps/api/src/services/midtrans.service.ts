@@ -132,7 +132,6 @@ export class MidtransService {
       transaction_status === 'settlement' ||
       transaction_status === 'capture'
     ) {
-      // Cek apakah payment untuk booking ini sudah ada
       const existingPayment = await prisma.payment.findUnique({
         where: { booking_id: order_id },
       });
@@ -146,26 +145,27 @@ export class MidtransService {
             payment_proof_url: null,
           },
         });
+        console.log('✅ Payment created');
       }
 
-      // Update status booking ke COMPLETED
-      await prisma.booking.update({
+      const updated = await prisma.booking.update({
         where: { id: order_id },
         data: {
-          status: 'COMPLETED',
+          status: 'CONFIRMED',
           payment_method: 'MIDTRANS',
         },
       });
+      console.log('✅ Booking status updated to CONFIRMED:', updated.id);
     }
 
     if (transaction_status === 'expire' || transaction_status === 'cancel') {
-      // Update status booking ke CANCELLED
       await prisma.booking.update({
         where: { id: order_id },
         data: {
           status: 'CANCELLED',
         },
       });
+      console.log('🛑 Booking status updated to CANCELLED');
     }
   }
 }

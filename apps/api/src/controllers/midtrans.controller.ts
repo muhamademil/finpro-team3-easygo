@@ -36,7 +36,7 @@ export class MidtransController {
     try {
       console.log('📩 Received Midtrans webhook body:');
       console.log(JSON.stringify(req.body, null, 2));
-      
+
       await this.service.handleTransactionStatusUpdate(req.body);
       console.log('📩 Received webhook from Midtrans:', req.body);
 

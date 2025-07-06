@@ -2,7 +2,7 @@ import api from '@/lib/axios';
 import {
   CreateBookingInput,
   Booking,
-  BookingPayload,
+  BookingDetailPayload,
 } from '../types/booking.types';
 
 export const createBooking = async (
@@ -17,7 +17,7 @@ export const getBookingDetail = async (id: string): Promise<Booking> => {
   return response.data;
 };
 
-export const getMyBookings = async (): Promise<BookingPayload[]> => {
+export const getMyBookings = async (): Promise<BookingDetailPayload[]> => {
   const response = await api.get('/bookings/me');
   return response.data;
 };

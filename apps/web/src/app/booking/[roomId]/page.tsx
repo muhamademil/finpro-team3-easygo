@@ -24,15 +24,28 @@ export default function BookingConfirmationPage() {
   const [form, setForm] = useState<CreateBookingInput>({
     user_id: '',
     room_id: '',
-    check_in: searchParams.get('check_in') || '2025-09-13',
-    check_out: searchParams.get('check_out') || '2025-09-15',
-    guest_adults: Number(searchParams.get('guest_adults')) || 1,
+    check_in: searchParams.get('check_in') || '2025-07-06',
+    check_out: searchParams.get('check_out') || '2025-07-07',
+    guest_adults: Number(searchParams.get('guest_adults')) || 2,
     guest_children: Number(searchParams.get('guest_children')) || 0,
     full_name: '',
     email: '',
     phone: '',
     payment_method: 'MIDTRANS',
   });
+
+  const getTotalNights = () => {
+    const checkIn = new Date(form.check_in);
+    const checkOut = new Date(form.check_out);
+    const diff =
+      (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24);
+    return Math.max(diff, 1); // Minimal 1 malam
+  };
+
+  const getTotalPrice = () => {
+    const nights = getTotalNights();
+    return room ? room.base_price * nights : 0;
+  };
 
   // const [form, setForm] = useState<CreateBookingInput>({
   //   user_id: '08db47d4-6dd4-420d-a4e3-61dd9fcc2c56', // dari context auth / sementara hardcode
@@ -241,7 +254,7 @@ export default function BookingConfirmationPage() {
   const totalPrice = room.base_price + 789;
 
   return (
-    <div className="bg-blue-100 min-h-screen">
+    <div className="min-h-screen pt-15">
       <div className="max-w-7xl mx-auto px-7 py-17 grid grid-cols-1 md:grid-cols-2 gap-6 font-sans bg-gray-50 rounded-2xl shadow-lg">
         {/* Left: Form */}
         <div className="space-y-6">
@@ -394,18 +407,16 @@ export default function BookingConfirmationPage() {
 
             <p className="font-medium mt-4 text-gray-600">Price Breakdown</p>
             <p className="text-gray-600">
-              Rooms:{' '}
+              Rooms ({getTotalNights()} night{getTotalNights() > 1 ? 's' : ''}):{' '}
               <span className="float-right">
-                IDR {room.base_price.toLocaleString()}
+                IDR{' '}
+                {(room.base_price * getTotalNights()).toLocaleString('id-ID')}
               </span>
-            </p>
-            <p className="text-gray-600">
-              Transfer Tax: <span className="float-right">IDR 789</span>
             </p>
             <p className="font-bold mt-2 text-gray-600">
               Total:{' '}
               <span className="float-right">
-                IDR {totalPrice.toLocaleString()}
+                IDR {getTotalPrice().toLocaleString('id-ID')}
               </span>
             </p>
           </div>

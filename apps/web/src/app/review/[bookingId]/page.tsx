@@ -3,6 +3,7 @@
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from '@/lib/axios';
+import { BookingDetailPayload } from '@/types/booking.types';
 
 export default function ReviewFormPage() {
   const { bookingId } = useParams();
@@ -10,7 +11,7 @@ export default function ReviewFormPage() {
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
-  const [booking, setBooking] = useState<any>(null);
+  const [booking, setBooking] = useState<BookingDetailPayload | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,27 +46,26 @@ export default function ReviewFormPage() {
     }
 
     try {
-      await axios.post('/review', {
+      await axios.post('/reviews', {
         bookingId: booking.id,
+        propertyId: booking.room.property.id,
         rating,
         comment,
-        propertyId: booking.room.property.id,
-        userId: booking.user.id, // ← tambahkan ini jika belum menggunakan middleware auth
+      });
+
+      console.log('submit review payload', {
+        bookingId: booking?.id,
+        rating,
+        comment,
+        propertyId: booking?.room?.property?.id,
       });
 
       alert('Review berhasil dikirim');
-      // router.push('/booking');
+      router.push('/dashboard/booking/my-booking');
     } catch (err) {
       console.error(err);
       alert('Gagal mengirim review');
     }
-
-    console.log('submit review payload', {
-      bookingId: booking?.id,
-      rating,
-      comment,
-      propertyId: booking?.room?.property?.id,
-    });
   };
 
   if (loading)

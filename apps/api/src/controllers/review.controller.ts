@@ -6,9 +6,13 @@ export class ReviewController {
 
   public createReview = async (req: Request, res: Response) => {
     try {
-      // const userId = req.user?.id; --> jika sudah ada middleware auth
-      const userId = req.body.userId; // Atau ambil dari token JWT
+      const userId = req.user?.id; // jika sudah ada middleware auth
+      // const userId = req.body.userId; // Atau ambil dari token JWT
       const { bookingId, propertyId, rating, comment } = req.body;
+
+      if (!userId || !bookingId || !propertyId || !rating || !comment) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
 
       const review = await this.service.createReview({
         bookingId,
@@ -19,8 +23,8 @@ export class ReviewController {
       });
 
       res.status(201).json({ message: 'Review created', data: review });
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to create review', error: err });
     }
   };
 
@@ -32,8 +36,10 @@ export class ReviewController {
         return res.status(404).json({ message: 'Review not found' });
       }
       res.json(review);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: 'Failed to get review by booking id', error: err });
     }
   };
 
@@ -42,19 +48,21 @@ export class ReviewController {
       const { propertyId } = req.params;
       const reviews = await this.service.getReviewsByPropertyId(propertyId);
       res.json(reviews);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: 'Failed to get review by property id', error: err });
     }
   };
 
   public async deleteReviews(req: Request, res: Response) {
-      try {
-        const { id } = req.params;
-        await this.service.deleteReviews(id);
+    try {
+      const { id } = req.params;
+      await this.service.deleteReviews(id);
 
-        res.json({ message: 'Review deleted' });
-      } catch (err) {
-        res.status(500).json({ message: 'Failed to delete review', error: err });
-      }
+      res.json({ message: 'Review deleted' });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to delete review', error: err });
     }
+  }
 }

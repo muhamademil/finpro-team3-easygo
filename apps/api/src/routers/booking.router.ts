@@ -15,26 +15,35 @@ export class BookingRouter {
   private setRoutes(): void {
     this.router.post(
       '/bookings',
+      authMiddleware,
       this.controller.createBooking.bind(this.controller),
     );
     this.router.get(
       '/bookings/me',
+      authMiddleware,
       this.controller.findMyBookings.bind(this.controller),
     );
     this.router.get(
       '/bookings/:id',
+      authMiddleware,
       this.controller.findBookingById.bind(this.controller),
     );
     this.router.get(
       '/bookings',
+      authMiddleware,
+      tenantMiddleware,
       this.controller.findAllBooking.bind(this.controller),
     );
     this.router.put(
       '/bookings/:id',
+      authMiddleware,
+      tenantMiddleware,
       this.controller.updateBookingStatus.bind(this.controller),
     );
     this.router.delete(
       '/bookings/:id',
+      authMiddleware,
+      tenantMiddleware,
       this.controller.deleteBooking.bind(this.controller),
     );
   }

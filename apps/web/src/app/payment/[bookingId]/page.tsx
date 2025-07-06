@@ -65,6 +65,9 @@ export default function ManualPaymentPage() {
     const nights = Math.ceil(
       (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24),
     );
+    const basePrice = booking.room.base_price;
+    const transferFee = 789;
+
     return nights * booking.room.base_price;
   };
 
@@ -135,62 +138,68 @@ export default function ManualPaymentPage() {
     );
 
   return (
-    <div className='bg-blue-50 min-h-screen flex items-center justify-center'>
+    <div className="bg-blue-50 min-h-screen flex items-center justify-center">
       <div className="max-w-2xl mx-auto p-6 mt-8 bg-white rounded-xl shadow space-y-6">
-      <div className="flex flex-col items-center text-center">
-        <p className="text-gray-900">Waktu Menyelesaikan Pembayaran Tersisa</p>
-        <p className="text-3xl font-bold text-green-600">{timeLeft}</p>
-        <span className="text-sm bg-yellow-200 text-yellow-800 px-2 py-1 rounded mt-1">
-          Waiting for Payment
-        </span>
-        <p className="text-xs mt-1 text-gray-500">
-          Batas Pembayaran:{' '}
-          {booking.expires_at
-            ? new Date(booking.expires_at).toLocaleString()
-            : 'Belum tersedia'}
-        </p>
-      </div>
-
-      <div className="border rounded p-4 bg-gray-50">
-        <div className="mb-2">
-          <p className="text-sm text-gray-800">Kode Invoice</p>
-          <p className="font-semibold text-blue-700">
-            {booking.id.toUpperCase()}
+        <div className="flex flex-col items-center text-center">
+          <p className="text-gray-900">
+            Waktu Menyelesaikan Pembayaran Tersisa
+          </p>
+          <p className="text-3xl font-bold text-green-600">{timeLeft}</p>
+          <span className="text-sm bg-yellow-200 text-yellow-800 px-2 py-1 rounded mt-1">
+            Waiting for Payment
+          </span>
+          <p className="text-xs mt-1 text-gray-500">
+            Batas Pembayaran:{' '}
+            {booking.expires_at
+              ? new Date(booking.expires_at).toLocaleString()
+              : 'Belum tersedia'}
           </p>
         </div>
-        <div className="mb-2">
-          <p className="text-sm text-gray-900">Transfer Ke</p>
-          <p className="font-semibold text-blue-700">53210203221 A/n EasyGo</p>
-        </div>
-        <div className="mb-2">
-          <p className="text-sm text-gray-900">Total Pembayaran</p>
-          <p className="text-lg font-bold text-blue-700">
-            Rp{' '}
-            {(booking.payment?.amount || getTotalPrice()).toLocaleString(
-              'id-ID',
-            )}
-          </p>
-        </div>
-      </div>
 
-      <div>
-        <label className="block font-semibold mb-2 text-gray-800">Upload Payment Proof</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setProofFile(e.target.files?.[0] || null)}
-          className="border p-2 w-full rounded text-gray-600"
-        />
-      </div>
+        <div className="border rounded p-4 bg-gray-50">
+          <div className="mb-2">
+            <p className="text-sm text-gray-800">Kode Invoice</p>
+            <p className="font-semibold text-blue-700">
+              {booking.id.toUpperCase()}
+            </p>
+          </div>
+          <div className="mb-2">
+            <p className="text-sm text-gray-900">Transfer Ke</p>
+            <p className="font-semibold text-blue-700">
+              53210203221 A/n EasyGo
+            </p>
+          </div>
+          <div className="mb-2">
+            <p className="text-sm text-gray-900">Total Pembayaran</p>
+            <p className="text-lg font-bold text-blue-700">
+              Rp{' '}
+              {(booking.payment?.amount || getTotalPrice()).toLocaleString(
+                'id-ID',
+              )}
+            </p>
+          </div>
+        </div>
 
-      <button
-        onClick={handleSubmit}
-        className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded"
-        disabled={uploading}
-      >
-        {uploading ? 'Mengupload...' : 'Telah Melakukan Pembayaran'}
-      </button>
-    </div>
+        <div>
+          <label className="block font-semibold mb-2 text-gray-800">
+            Upload Payment Proof
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setProofFile(e.target.files?.[0] || null)}
+            className="border p-2 w-full rounded text-gray-600"
+          />
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded"
+          disabled={uploading}
+        >
+          {uploading ? 'Mengupload...' : 'Telah Melakukan Pembayaran'}
+        </button>
+      </div>
     </div>
   );
 }
