@@ -3,6 +3,8 @@ import Button from '@/components/Elements/Button';
 import Link from 'next/link';
 import { getMyPropertiesAPI } from '@/services/tenant.service';
 
+export const dynamic = 'force-dynamic';
+
 export default async function TenantPropertyPage() {
   const tenantProperties = await getMyPropertiesAPI();
   return (

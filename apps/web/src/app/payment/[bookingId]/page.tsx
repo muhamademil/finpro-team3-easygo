@@ -4,13 +4,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createManualPayment } from '@/api/payment.service';
 import { getBookingDetail } from '@/api/booking.service';
-import Image from 'next/image';
+import { Booking } from '@/types/booking.types';
 
 export default function ManualPaymentPage() {
   const { bookingId } = useParams();
   const router = useRouter();
 
-  const [booking, setBooking] = useState<any>(null);
+  const [booking, setBooking] = useState<Booking | null>(null);
   const [timeLeft, setTimeLeft] = useState('');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -65,8 +65,6 @@ export default function ManualPaymentPage() {
     const nights = Math.ceil(
       (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24),
     );
-    const basePrice = booking.room.base_price;
-    const transferFee = 789;
 
     return nights * booking.room.base_price;
   };

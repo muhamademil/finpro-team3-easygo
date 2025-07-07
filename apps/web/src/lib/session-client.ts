@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from './config';
 
 interface SessionPayload {
   id: string;

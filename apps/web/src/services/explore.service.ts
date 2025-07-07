@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import { Property } from '@/types/type';
+import { Property } from '@/types/explore.types';
 import { SearchFilters } from '@/types/explore.types';
 
 // Tipe untuk hasil API yang menyertakan pagination
@@ -13,14 +13,8 @@ type PaginatedProperties = {
   };
 };
 
-/**
- * Memanggil endpoint GET /api/properties dengan semua filter,
- * sorting, dan pagination yang relevan.
- * @param filters - Objek berisi semua parameter pencarian.
- */
 export const searchPropertiesAPI = async (filters: SearchFilters) => {
   try {
-    // Pisahkan sortBy menjadi dua bagian untuk API
     const [sortBy, orderBy] = filters.sortBy.split('_');
 
     const response = await api.get('/properties', {
@@ -30,18 +24,15 @@ export const searchPropertiesAPI = async (filters: SearchFilters) => {
           filters.category === 'all'
             ? undefined
             : filters.category.toUpperCase(),
-        limit: 10, // Atur items per page di sini
+        limit: 10,
         page: filters.page,
         sortBy,
         orderBy,
-        // Anda bisa menambahkan parameter lain di sini nanti, seperti harga
       },
     });
-    // Kembalikan seluruh objek data dari API
     return response.data.data as PaginatedProperties;
   } catch (error) {
     console.error('Gagal melakukan pencarian properti:', error);
-    // Kembalikan struktur data default jika gagal
     return {
       properties: [],
       pagination: { total: 0, page: 1, limit: 10, totalPages: 0 },

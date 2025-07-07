@@ -35,6 +35,25 @@ export interface Booking {
   status: BookingStatus;
   expires_at: string | null;
   created_at: string;
+  room: {
+    base_price: number;
+  };
+  payment?: {
+    amount: number;
+  };
+}
+
+export interface BookingDetail {
+  id: string;
+  check_in: string;
+  check_out: string;
+  expires_at?: string;
+  payment?: {
+    amount: number;
+  };
+  room: {
+    base_price: number;
+  };
 }
 
 export interface BookingDetailPayload {
@@ -55,6 +74,7 @@ export interface BookingDetailPayload {
   room: {
     id: string;
     name: string;
+    base_price: number;
     images: {
       image_url: string;
     }[];

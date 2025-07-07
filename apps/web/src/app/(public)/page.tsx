@@ -12,7 +12,6 @@ import { PropertyCard } from '@/components/Features/Shared/PropertyCard';
 import { Property } from '@/types/type';
 
 import { CategorySection } from '@/components/Features/Homepage/Sections/CategorySection';
-// import { FlashSaleSection } from '@/components/Features/Homepage/Sections/FlashSaleSection';
 import { PromoSection } from '@/components/Features/Homepage/Sections/PromoSection';
 import { WhyChooseUsSection } from '@/components/Features/Homepage/Sections/WhyChooseUsSection';
 import { NewsletterSection } from '@/components/Features/Homepage/Sections/NewsletterSection';

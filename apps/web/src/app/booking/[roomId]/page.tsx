@@ -8,6 +8,7 @@ import { CreateBookingInput } from '@/types/booking.types';
 import { getRoomById } from '@/api/room.service';
 import { RoomType } from '@/types/room.types';
 import { getClientSession } from '@/lib/session-client';
+import Image from 'next/image';
 
 export default function BookingConfirmationPage() {
   const params = useParams();
@@ -39,26 +40,13 @@ export default function BookingConfirmationPage() {
     const checkOut = new Date(form.check_out);
     const diff =
       (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24);
-    return Math.max(diff, 1); // Minimal 1 malam
+    return Math.max(diff, 1);
   };
 
   const getTotalPrice = () => {
     const nights = getTotalNights();
     return room ? room.base_price * nights : 0;
   };
-
-  // const [form, setForm] = useState<CreateBookingInput>({
-  //   user_id: '08db47d4-6dd4-420d-a4e3-61dd9fcc2c56', // dari context auth / sementara hardcode
-  //   room_id: roomId as string,
-  //   check_in: '2025-09-13',
-  //   check_out: '2025-09-15',
-  //   guest_adults: 1,
-  //   guest_children: 1,
-  //   full_name: '',
-  //   email: '',
-  //   phone: '',
-  //   payment_method: 'MIDTRANS',
-  // });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,7 +58,7 @@ export default function BookingConfirmationPage() {
 
       try {
         const roomData = await getRoomById(roomId as string);
-        console.log('roomId sent to API:', roomId); // Harus UUID
+        console.log('roomId sent to API:', roomId);
 
         setRoom(roomData);
         setForm((prev) => ({
@@ -87,26 +75,7 @@ export default function BookingConfirmationPage() {
     };
 
     fetchData();
-  }, [roomId]);
-
-  // useEffect(() => {
-  //   const fetchRoom = async () => {
-  //     try {
-  //       if (!roomId) {
-  //         console.warn('Room ID not found in params');
-  //         return;
-  //       }
-  //       const res = await getRoomById(roomId as string);
-  //       setRoom(res);
-  //     } catch (error) {
-  //       console.error('Failed to fetch room:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchRoom();
-  // }, [roomId]);
+  }, [roomId, router]);
 
   useEffect(() => {
     const session = getClientSession();
@@ -120,7 +89,7 @@ export default function BookingConfirmationPage() {
       alert('Unauthorized: Only TRAVELLER can book');
       router.push('/login');
     }
-  }, [roomId]);
+  }, [roomId, router]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -155,33 +124,6 @@ export default function BookingConfirmationPage() {
       setIsSubmitting(false);
     }
   };
-
-  // const handleSubmit = async () => {
-  //   if (!form.full_name || !form.email || !form.phone) {
-  //     alert('Please complete all personal information');
-  //     return;
-  //   }
-
-  //   setIsSubmitting(true);
-
-  //   try {
-  //     const booking = await createBooking(form);
-  //     if (form.payment_method === 'MIDTRANS') {
-  //       const res = await api.post('/payments/snap', {
-  //         bookingId: booking.id,
-  //       });
-  //       const { redirectUrl } = res.data;
-  //       window.location.href = redirectUrl;
-  //     } else {
-  //       router.push(`/payment/${booking.id}`);
-  //     }
-  //   } catch (error) {
-  //     alert('Booking failed. Please try again.');
-  //     console.error(error);
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
 
   if (loading) {
     return (
@@ -250,8 +192,6 @@ export default function BookingConfirmationPage() {
       </div>
     );
   }
-
-  const totalPrice = room.base_price + 789;
 
   return (
     <div className="min-h-screen pt-15">
@@ -376,7 +316,7 @@ export default function BookingConfirmationPage() {
 
         {/* Right: Summary */}
         <div className="bg-white rounded-xl shadow p-6 space-y-4">
-          <img
+          <Image
             src={
               room.images?.[0]?.image_url ||
               'https://via.placeholder.com/400x200'

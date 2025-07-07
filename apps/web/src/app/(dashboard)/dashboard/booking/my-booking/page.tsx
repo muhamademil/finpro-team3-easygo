@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BookingDetailPayload } from '@/types/booking.types';
 import { getMyBookings } from '@/api/booking.service';
+import Image from 'next/image';
 
 export default function MyBookingsPage() {
   const [bookings, setBookings] = useState<BookingDetailPayload[]>([]);
@@ -75,7 +76,7 @@ export default function MyBookingsPage() {
               className="border rounded-xl p-4 flex items-start gap-4 shadow-sm hover:shadow-md transition"
             >
               {image && (
-                <img
+                <Image
                   src={image}
                   alt={property.name}
                   className="w-32 h-24 rounded object-cover"

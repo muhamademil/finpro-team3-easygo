@@ -6,11 +6,11 @@ export default async function BookingLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSideSession();
+  // const session = await getServerSideSession();
 
-  if (!session || session.role !== 'TRAVELLER') {
-    redirect('/login');
-  }
+  // if (!session || session.role !== 'TRAVELLER') {
+  //   redirect('/login');
+  // }
 
   return (
     <div className="bg-white min-h-screen">
