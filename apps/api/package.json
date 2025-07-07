@@ -12,7 +12,8 @@
     "migrate:dev": "npx prisma migrate dev",
     "generate:dev": "npx prisma generate dev",
     "studio": "npx prisma studio",
-    "seed": "prisma db seed"
+    "seed": "prisma db seed",
+    "start": "node dist/index.js"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

@@ -14,9 +14,6 @@ import { BookingRouter } from './routers/booking.router';
 import { RoomRouter } from './routers/room.router';
 import { PaymentRouter } from './routers/payment.router';
 import { ReviewRouter } from './routers/review.router';
-// import passport from 'passport';
-// import session from 'express-session';
-// import { configurePassport } from './lib/config/passport.config';
 import { PropertyRouter } from './routers/property.router';
 import { ResponseError } from './error/response.error';
 import { FacilityRouter } from './routers/facility.router';
@@ -82,13 +79,14 @@ export default class App {
     this.app.use('/api', bookingRouter.getRouter());
     this.app.use('/api', roomRouter.getRouter());
     this.app.use('/api', paymentRouter.getRouter());
-    this.app.use('/api/rooms', roomRouter.getRouter());
+    // this.app.use('/api/rooms', roomRouter.getRouter());
     this.app.use('/api', reviewRouter.getRouter());
   }
 
   public start(): void {
-    this.app.listen(CONFIG.PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${CONFIG.PORT}/`);
+    const PORT = process.env.PORT || CONFIG.PORT || 8000;
+    this.app.listen(PORT, () => {
+      console.log(`  ➜  [API] Server running on port ${PORT}`);
     });
   }
 }
