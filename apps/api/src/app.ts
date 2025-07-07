@@ -89,4 +89,8 @@ export default class App {
       console.log(`  ➜  [API] Server running on port ${PORT}`);
     });
   }
+
+  public get expressApp(): Express {
+    return this.app;
+  }
 }
