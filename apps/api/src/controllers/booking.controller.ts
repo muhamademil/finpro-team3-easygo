@@ -75,6 +75,40 @@ export class BookingController {
     }
   }
 
+  public async approveBooking(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const updated = await service.updateBookingStatus(id, {
+        status: 'CONFIRMED',
+      });
+      return res.json({
+        message: 'Booking approved',
+        data: updated,
+      });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: 'Failed to approve booking', error: err });
+    }
+  }
+
+  public async rejectBooking(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const updated = await service.updateBookingStatus(id, {
+        status: 'CANCELLED',
+      });
+      return res.json({
+        message: 'Booking rejected',
+        data: updated,
+      });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: 'Failed to reject booking', error: err });
+    }
+  }
+
   public async deleteBooking(req: Request, res: Response) {
     try {
       const { id } = req.params;

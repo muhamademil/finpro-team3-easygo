@@ -1,8 +1,7 @@
-// app/(dashboard)/dashboard/booking/page.tsx
 'use client';
 
-import { useState, useMemo } from 'react';
-import type { Booking } from '@/types/type';
+import { useEffect, useState, useMemo } from 'react';
+import type { Booking, BookingCardData } from '@/types/booking.types';
 import { BookingCard } from '@/components/Features/Tenant/Booking/BookingCard';
 import { BookingStatsCard } from '@/components/Features/Tenant/Booking/BookingStatsCard';
 import {
@@ -13,175 +12,139 @@ import {
   Clock,
   Ban,
 } from 'lucide-react';
-// Import modal dari ShadCN
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  getBookingsForTenant,
+  approveBooking,
+  rejectBooking,
+} from '@/api/booking.service';
 import Image from 'next/image';
 
-// Data dummy (ganti dengan fetch API)
-const dummyBookings: Booking[] = [
-  {
-    id: '#42311',
-    bookedBy: {
-      name: 'Aulia Nadia',
-      phone: '0851 6278 8299',
-      email: 'nadiaaul@mail.com',
-      imageUrl: 'https://i.pravatar.cc/150?u=aulia',
-    },
-    schedule: { start: new Date('2025-06-02'), end: new Date('2025-06-04') },
-    payment: {
-      date: new Date('2025-06-01 13:20'),
-      method: 'manual',
-      proofUrl:
-        'https://res.cloudinary.com/dohpngcuj/image/upload/v1750849989/promo1_l8hwic.png',
-    },
-    status: 'pending_confirmation',
-  },
-  {
-    id: '#42312',
-    bookedBy: {
-      name: 'Rizky Pratama',
-      phone: '0812 3456 7890',
-      email: 'rizky@mail.com',
-      imageUrl: 'https://i.pravatar.cc/150?u=rizky',
-    },
-    schedule: { start: new Date('2025-06-05'), end: new Date('2025-06-06') },
-    payment: { date: new Date('2025-06-02 10:00'), method: 'midtrans' },
-    status: 'confirmed',
-  },
-  {
-    id: '#42313',
-    bookedBy: {
-      name: 'Siti Aminah',
-      phone: '0878 1111 2222',
-      email: 'siti@mail.com',
-      imageUrl: 'https://i.pravatar.cc/150?u=siti',
-    },
-    schedule: { start: new Date('2025-06-07'), end: new Date('2025-06-09') },
-    payment: {
-      date: new Date('2025-06-03 15:45'),
-      method: 'manual',
-      proofUrl:
-        'https://res.cloudinary.com/dohpngcuj/image/upload/v1750849989/promo2_e7kviq.png',
-    },
-    status: 'completed',
-  },
-  {
-    id: '#42314',
-    bookedBy: {
-      name: 'Budi Santoso',
-      phone: '0821 9876 5432',
-      email: 'budi@mail.com',
-      imageUrl: 'https://i.pravatar.cc/150?u=budi',
-    },
-    schedule: { start: new Date('2025-06-10'), end: new Date('2025-06-11') },
-    payment: {
-      date: new Date('2025-06-04 09:10'),
-      method: 'manual',
-      proofUrl: '...',
-    },
-    status: 'rejected',
-  },
-  {
-    id: '#42315',
-    bookedBy: {
-      name: 'Dewi Lestari',
-      phone: '0855 1234 5678',
-      email: 'dewi@mail.com',
-      imageUrl: 'https://i.pravatar.cc/150?u=dewi',
-    },
-    schedule: { start: new Date('2025-06-12'), end: new Date('2025-06-15') },
-    payment: { date: new Date('2025-06-05 11:30'), method: 'midtrans' },
-    status: 'cancelled',
-  },
-];
+const MAIN_TABS = ['Payments', 'Rooms'] as const;
+const SUB_TABS = ['All', 'Antrian', 'Approved', 'Reject'] as const;
 
 export default function BookingPage() {
   const [mainTab, setMainTab] = useState<'Payments' | 'Rooms'>('Payments');
-  const [subTab, setSubTab] = useState<
-    'All' | 'Antrian' | 'Approved' | 'Reject'
-  >('All');
-  const [bookings, setBookings] = useState<Booking[]>(dummyBookings);
-
-  // State untuk modal
+  const [subTab, setSubTab] = useState<(typeof SUB_TABS)[number]>('All');
+  const [bookings, setBookings] = useState<BookingCardData[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [proofUrl, setProofUrl] = useState('');
 
-  // Logika untuk menghitung statistik
-  const stats = useMemo(
-    () => ({
-      queuePayment: bookings.filter((b) => b.status === 'pending_confirmation')
-        .length,
-      approvePayment: bookings.filter(
-        (b) =>
-          b.status === 'confirmed' ||
-          b.status === 'completed' ||
-          b.status === 'cancelled',
-      ).length,
-      rejectPayment: bookings.filter((b) => b.status === 'rejected').length,
-      queueRooms: bookings.filter((b) => b.status === 'confirmed').length,
-      approveRooms: bookings.filter((b) => b.status === 'completed').length,
-      cancelRooms: bookings.filter((b) => b.status === 'cancelled').length,
-    }),
-    [bookings],
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result: Booking[] = await getBookingsForTenant();
+        const mapped = result.map<BookingCardData>((b) => ({
+          id: b.id,
+          check_in: b.check_in,
+          check_out: b.check_out,
+          status: b.status,
+          payment_method: b.payment_method,
+          phone: b.phone,
+          user: {
+            name: b.full_name,
+            email: b.email,
+            phone: b.phone,
+            imageUrl:
+              'https://i.pinimg.com/736x/58/79/29/5879293da8bd698f308f19b15d3aba9a.jpg',
+          },
+          payment: {
+            amount: b.payment?.amount ?? 0,
+            date: b.created_at,
+            method: b.payment_method,
+            proofUrl:
+              b.payment_method === 'MANUAL'
+                ? '/uploads/payment.jpg'
+                : undefined,
+          },
+        }));
+        setBookings(mapped);
+      } catch (err) {
+        console.error('Failed to load tenant bookings:', err);
+      }
+    };
+    fetchData();
+  }, []);
 
-  // Logika untuk memfilter data booking sesuai tab
+  const stats = useMemo(() => {
+    return {
+      queuePayment: bookings.filter((b) => b.status === 'PENDING_CONFIRMATION')
+        .length,
+      approvePayment: bookings.filter((b) =>
+        ['CONFIRMED', 'COMPLETED', 'CANCELLED'].includes(b.status),
+      ).length,
+      rejectPayment: 0,
+      queueRooms: bookings.filter((b) => b.status === 'CONFIRMED').length,
+      approveRooms: bookings.filter((b) => b.status === 'COMPLETED').length,
+      cancelRooms: bookings.filter((b) => b.status === 'CANCELLED').length,
+    };
+  }, [bookings]);
+
   const filteredBookings = useMemo(() => {
     let list = bookings;
-
     if (mainTab === 'Payments') {
-      if (subTab === 'Antrian')
-        list = bookings.filter((b) => b.status === 'pending_confirmation');
-      if (subTab === 'Approved')
-        list = bookings.filter(
-          (b) =>
-            b.status === 'confirmed' ||
-            b.status === 'completed' ||
-            b.status === 'cancelled',
+      if (subTab === 'Antrian') {
+        list = bookings.filter((b) => b.status === 'PENDING_CONFIRMATION');
+      } else if (subTab === 'Approved') {
+        list = bookings.filter((b) =>
+          ['CONFIRMED', 'COMPLETED', 'CANCELLED'].includes(b.status),
         );
-      if (subTab === 'Reject')
-        list = bookings.filter((b) => b.status === 'rejected');
+      } else if (subTab === 'Reject') {
+        list = []; // implement if needed
+      }
     } else {
-      // Rooms
-      if (subTab === 'Antrian')
-        list = bookings.filter((b) => b.status === 'confirmed');
-      if (subTab === 'Approved')
-        list = bookings.filter((b) => b.status === 'completed');
-      if (subTab === 'Reject')
-        list = bookings.filter((b) => b.status === 'cancelled');
+      if (subTab === 'Antrian') {
+        list = bookings.filter((b) => b.status === 'CONFIRMED');
+      } else if (subTab === 'Approved') {
+        list = bookings.filter((b) => b.status === 'COMPLETED');
+      } else if (subTab === 'Reject') {
+        list = bookings.filter((b) => b.status === 'CANCELLED');
+      }
     }
     return list;
   }, [bookings, mainTab, subTab]);
 
-  const handleApprove = (id: string) => {
-    // Simulasi API call
-    console.log(`Approving ${id}`);
-    setBookings((prev) =>
-      prev.map((b) => {
-        if (b.id !== id) return b;
-        if (mainTab === 'Payments') return { ...b, status: 'confirmed' };
-        if (mainTab === 'Rooms') return { ...b, status: 'completed' };
-        return b;
-      }),
-    );
+  const handleApprove = async (id: string) => {
+    try {
+      const updated = await approveBooking(id);
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === id
+            ? {
+                ...b,
+                status: mainTab === 'Payments' ? 'CONFIRMED' : 'COMPLETED',
+              }
+            : b,
+        ),
+      );
+    } catch (err) {
+      console.error('Failed to approve booking:', err);
+    }
   };
-  const handleReject = (id: string) => {
-    // Simulasi API call
-    console.log(`Rejecting ${id}`);
-    setBookings((prev) =>
-      prev.map((b) => {
-        if (b.id !== id) return b;
-        if (mainTab === 'Payments') return { ...b, status: 'rejected' };
-        if (mainTab === 'Rooms') return { ...b, status: 'cancelled' };
-        return b;
-      }),
-    );
+
+  const handleReject = async (id: string) => {
+    try {
+      const updated = await rejectBooking(id);
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === id
+            ? {
+                ...b,
+                status: 'CANCELLED',
+              }
+            : b,
+        ),
+      );
+    } catch (err) {
+      console.error('Failed to reject booking:', err);
+    }
   };
+
   const handleShowProof = (url: string) => {
     setProofUrl(url);
     setIsModalOpen(true);
@@ -191,7 +154,7 @@ export default function BookingPage() {
     <div>
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Booking</h1>
 
-      {/* Statistik Atas */}
+      {/* Statistik */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         <BookingStatsCard
           title="Queue Payment"
@@ -231,36 +194,41 @@ export default function BookingPage() {
         />
       </div>
 
-      {/* Tabs Utama */}
+      {/* Main Tabs */}
       <div className="flex border-b mb-6">
-        <button
-          onClick={() => setMainTab('Payments')}
-          className={`px-4 py-2 text-sm font-semibold ${mainTab === 'Payments' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}
-        >
-          Payments
-        </button>
-        <button
-          onClick={() => setMainTab('Rooms')}
-          className={`px-4 py-2 text-sm font-semibold ${mainTab === 'Rooms' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}
-        >
-          Rooms
-        </button>
-      </div>
-
-      {/* Sub-Tabs */}
-      <div className="flex items-center gap-4 mb-6">
-        {(['All', 'Antrian', 'Approved', 'Reject'] as const).map((tab) => (
+        {MAIN_TABS.map((tab) => (
           <button
             key={tab}
-            onClick={() => setSubTab(tab)}
-            className={`px-3 py-1.5 text-sm rounded-full ${subTab === tab ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+            onClick={() => setMainTab(tab)}
+            className={`px-4 py-2 text-sm font-semibold ${
+              mainTab === tab
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-500'
+            }`}
           >
             {tab}
           </button>
         ))}
       </div>
 
-      {/* Daftar Booking */}
+      {/* Sub Tabs */}
+      <div className="flex items-center gap-4 mb-6">
+        {SUB_TABS.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setSubTab(tab)}
+            className={`px-3 py-1.5 text-sm rounded-full ${
+              subTab === tab
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Booking Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredBookings.map((booking) => (
           <BookingCard
@@ -274,7 +242,7 @@ export default function BookingPage() {
         ))}
       </div>
 
-      {/* Modal untuk Payment Proof */}
+      {/* Modal Proof */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>

@@ -1,5 +1,5 @@
 // components/features/booking/BookingCard.tsx
-import type { Booking } from '@/types/type';
+import type { BookingCardData } from '@/types/booking.types';
 import {
   Card,
   CardHeader,
@@ -9,24 +9,21 @@ import {
 import Image from 'next/image';
 import Button from '@/components/Elements/Button';
 
-// Fungsi untuk styling badge status
-const getStatusBadge = (status: Booking['status']) => {
+const getStatusBadge = (status: BookingCardData['status']) => {
   const styles = {
-    pending_confirmation: 'bg-yellow-100 text-yellow-800',
-    confirmed: 'bg-blue-100 text-blue-800',
-    completed: 'bg-green-100 text-green-800',
-    rejected: 'bg-red-100 text-red-800',
-    cancelled: 'bg-red-100 text-red-800',
-    pending_payment: 'bg-gray-100 text-gray-800',
-  };
+    PENDING_CONFIRMATION: 'bg-yellow-100 text-yellow-800',
+    CONFIRMED: 'bg-blue-100 text-blue-800',
+    COMPLETED: 'bg-green-100 text-green-800',
+    CANCELLED: 'bg-red-100 text-red-800',
+    PENDING_PAYMENT: 'bg-gray-100 text-gray-800',
+  } as const;
   const text = {
-    pending_confirmation: 'Waiting Payment Approval',
-    confirmed: 'Waiting Room Approval',
-    completed: 'Completed',
-    rejected: 'Payment Rejected',
-    cancelled: 'Room Cancelled',
-    pending_payment: 'Waiting Payment',
-  };
+    PENDING_CONFIRMATION: 'Waiting Payment Approval',
+    CONFIRMED: 'Waiting Room Approval',
+    COMPLETED: 'Completed',
+    CANCELLED: 'Room Cancelled',
+    PENDING_PAYMENT: 'Waiting Payment',
+  } as const;
   return (
     <span
       className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status]}`}
@@ -37,7 +34,7 @@ const getStatusBadge = (status: Booking['status']) => {
 };
 
 type BookingCardProps = {
-  booking: Booking;
+  booking: BookingCardData;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
   onShowProof: (url: string) => void;
@@ -52,10 +49,9 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   mainTab,
 }) => {
   const canApproveRejectPayment =
-    mainTab === 'Payments' && booking.status === 'pending_confirmation';
+    mainTab === 'Payments' && booking.status === 'PENDING_CONFIRMATION';
   const canApproveRejectRoom =
-    mainTab === 'Rooms' && booking.status === 'confirmed';
-
+    mainTab === 'Rooms' && booking.status === 'CONFIRMED';
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between items-center p-4 border-b">
@@ -65,35 +61,35 @@ export const BookingCard: React.FC<BookingCardProps> = ({
       <CardContent className="p-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
         <div className="flex items-center gap-2">
           <Image
-            src={booking.bookedBy.imageUrl}
-            alt={booking.bookedBy.name}
+            src={booking.user.imageUrl || '/default-avatar.png'}
+            alt={booking.user.name}
             width={24}
             height={24}
             className="rounded-full"
           />
-          <span>{booking.bookedBy.name}</span>
+          <span>{booking.user.name}</span>
         </div>
         <div>
-          <span className="text-gray-500">Phone:</span> {booking.bookedBy.phone}
+          <span className="text-gray-500">Phone:</span> {booking.phone}
         </div>
         <div>
           <span className="text-gray-500">Schedule:</span>{' '}
-          {booking.schedule.start.toLocaleDateString()} -{' '}
-          {booking.schedule.end.toLocaleDateString()}
+          {new Date(booking.check_in).toLocaleDateString()} -{' '}
+          {new Date(booking.check_out).toLocaleDateString()}
         </div>
         <div>
-          <span className="text-gray-500">Email:</span> {booking.bookedBy.email}
+          <span className="text-gray-500">Email:</span> {booking.user.email}
         </div>
         <div>
-          <span className="text-gray-500">Payment Date:</span>{' '}
-          {booking.payment.date.toLocaleString()}
+          <span className="text-gray-500">Payment Amount:</span> Rp
+          {booking.payment?.amount?.toLocaleString() ?? '0'}
         </div>
-        {booking.payment.method === 'manual' ? (
+        {booking.payment_method === 'MANUAL' && booking.payment?.proofUrl ? (
           <button
-            onClick={() => onShowProof(booking.payment.proofUrl!)}
+            onClick={() => onShowProof(booking.payment!.proofUrl!)}
             className="text-blue-600 hover:underline text-left"
           >
-            Payment Proof
+            View Payment Proof
           </button>
         ) : (
           <p>
@@ -122,16 +118,13 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             </Button>
           </div>
         )}
-        {booking.status === 'confirmed' && mainTab === 'Payments' && (
+        {booking.status === 'CONFIRMED' && mainTab === 'Payments' && (
           <p className="text-sm text-green-600 font-medium">Already Approved</p>
         )}
-        {booking.status === 'rejected' && (
-          <p className="text-sm text-red-600 font-medium">Already Rejected</p>
-        )}
-        {booking.status === 'completed' && (
+        {booking.status === 'COMPLETED' && (
           <p className="text-sm text-green-600 font-medium">Room Approved</p>
         )}
-        {booking.status === 'cancelled' && (
+        {booking.status === 'CANCELLED' && (
           <p className="text-sm text-red-600 font-medium">Room Cancelled</p>
         )}
       </CardFooter>

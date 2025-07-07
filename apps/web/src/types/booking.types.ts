@@ -37,6 +37,9 @@ export interface Booking {
   created_at: string;
   room: {
     base_price: number;
+    images?: {
+      image_url: string;
+    }[];
   };
   payment?: {
     amount: number;
@@ -54,6 +57,27 @@ export interface BookingDetail {
   room: {
     base_price: number;
   };
+}
+
+export interface BookingCardData {
+  id: string;
+  status: BookingStatus;
+  user: {
+    name: string;
+    email: string;
+    phone?: string;
+    imageUrl?: string;
+  };
+  check_in: string;
+  check_out: string;
+  phone: string;
+  payment_method: PaymentMethod;
+  payment: {
+    amount?: number;
+    date: string;
+    proofUrl?: string;
+  };
+  
 }
 
 export interface BookingDetailPayload {

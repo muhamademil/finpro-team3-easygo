@@ -40,6 +40,18 @@ export class BookingRouter {
       tenantMiddleware,
       this.controller.updateBookingStatus.bind(this.controller),
     );
+    this.router.patch(
+      '/bookings/:id/approve',
+      authMiddleware,
+      tenantMiddleware,
+      this.controller.approveBooking.bind(this.controller),
+    );
+    this.router.patch(
+      '/bookings/:id/reject',
+      authMiddleware,
+      tenantMiddleware,
+      this.controller.rejectBooking.bind(this.controller),
+    );
     this.router.delete(
       '/bookings/:id',
       authMiddleware,

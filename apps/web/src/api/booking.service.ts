@@ -21,3 +21,18 @@ export const getMyBookings = async (): Promise<BookingDetailPayload[]> => {
   const response = await api.get('/bookings/me');
   return response.data;
 };
+
+export const getBookingsForTenant = async (): Promise<Booking[]> => {
+  const response = await api.get('/bookings'); // tenant-accessible
+  return response.data;
+};
+
+export const approveBooking = async (id: string): Promise<Booking> => {
+  const response = await api.patch(`/bookings/${id}/approve`);
+  return response.data.data;
+};
+
+export const rejectBooking = async (id: string): Promise<Booking> => {
+  const response = await api.patch(`/bookings/${id}/reject`);
+  return response.data.data;
+};
