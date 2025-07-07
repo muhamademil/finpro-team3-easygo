@@ -53,7 +53,7 @@ export class MidtransService {
 
     const snapPayload = {
       transaction_details: {
-        order_id: booking.id.slice(0, 20),
+        order_id: booking.id,
         gross_amount: totalPrice,
       },
       customer_details: {
@@ -108,5 +108,64 @@ export class MidtransService {
       payment_method: booking.payment_method,
       status: booking.status,
     };
+  }
+
+  public async handleTransactionStatusUpdate(payload: any): Promise<void> {
+    const {
+      order_id,
+      transaction_status,
+      fraud_status,
+      payment_type,
+      transaction_id,
+      gross_amount,
+    } = payload;
+
+    if (!order_id) throw new Error('order_id is missing');
+
+    console.log(
+      `[MIDTRANS] Webhook - order_id: ${order_id}, status: ${transaction_status}, payment_type: ${payment_type}, fraud_status: ${fraud_status}`,
+    );
+
+    const amount = Number(gross_amount || 0);
+
+    if (
+      transaction_status === 'settlement' ||
+      transaction_status === 'capture'
+    ) {
+      const existingPayment = await prisma.payment.findUnique({
+        where: { booking_id: order_id },
+      });
+
+      if (!existingPayment) {
+        await prisma.payment.create({
+          data: {
+            booking_id: order_id,
+            amount,
+            paid_at: new Date(),
+            payment_proof_url: null,
+          },
+        });
+        console.log('✅ Payment created');
+      }
+
+      const updated = await prisma.booking.update({
+        where: { id: order_id },
+        data: {
+          status: 'CONFIRMED',
+          payment_method: 'MIDTRANS',
+        },
+      });
+      console.log('✅ Booking status updated to CONFIRMED:', updated.id);
+    }
+
+    if (transaction_status === 'expire' || transaction_status === 'cancel') {
+      await prisma.booking.update({
+        where: { id: order_id },
+        data: {
+          status: 'CANCELLED',
+        },
+      });
+      console.log('🛑 Booking status updated to CANCELLED');
+    }
   }
 }

@@ -13,6 +13,7 @@ import { AuthRouter } from './routers/auth.router';
 import { BookingRouter } from './routers/booking.router';
 import { RoomRouter } from './routers/room.router';
 import { PaymentRouter } from './routers/payment.router';
+import { ReviewRouter } from './routers/review.router';
 // import passport from 'passport';
 // import session from 'express-session';
 // import { configurePassport } from './lib/config/passport.config';
@@ -71,6 +72,7 @@ export default class App {
     const paymentRouter = new PaymentRouter();
     const bookingRouter = new BookingRouter();
     const roomRouter = new RoomRouter();
+    const reviewRouter = new ReviewRouter();
 
     this.app.use('/api/auth', authRouter.getRouter());
     this.app.use('/api/properties', propertyRouter.getRouter());
@@ -81,6 +83,7 @@ export default class App {
     this.app.use('/api', roomRouter.getRouter());
     this.app.use('/api', paymentRouter.getRouter());
     this.app.use('/api/rooms', roomRouter.getRouter());
+    this.app.use('/api', reviewRouter.getRouter());
   }
 
   public start(): void {

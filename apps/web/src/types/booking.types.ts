@@ -36,3 +36,32 @@ export interface Booking {
   expires_at: string | null;
   created_at: string;
 }
+
+export interface BookingDetailPayload {
+  id: string;
+  check_in: string;
+  check_out: string;
+  status: string;
+  review?: {
+    id: string;
+    rating: number;
+    comment: string;
+  } | null;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  room: {
+    id: string;
+    name: string;
+    images: {
+      image_url: string;
+    }[];
+    property: {
+      id: string;
+      name: string;
+      city: string;
+    };
+  };
+}

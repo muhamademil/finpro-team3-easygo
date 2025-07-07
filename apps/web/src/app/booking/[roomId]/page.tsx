@@ -1,52 +1,125 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import api from '@/lib/axios';
 import { createBooking } from '@/api/booking.service';
 import { CreateBookingInput } from '@/types/booking.types';
 import { getRoomById } from '@/api/room.service';
+import { RoomType } from '@/types/room.types';
+import { getClientSession } from '@/lib/session-client';
 
 export default function BookingConfirmationPage() {
-  const { roomId } = useParams();
+  const params = useParams();
+  const roomId = Array.isArray(params.roomId)
+    ? params.roomId[0]
+    : params.roomId;
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  console.log('roomId:', roomId);
-
-  const [room, setRoom] = useState<any>(null);
+  const [room, setRoom] = useState<RoomType | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState<CreateBookingInput>({
-    user_id: 'user-6-uuid', // dari context auth / sementara hardcode
-    room_id: roomId as string,
-    check_in: '2025-08-08',
-    check_out: '2025-08-11',
-    guest_adults: 2,
-    guest_children: 1,
+    user_id: '',
+    room_id: '',
+    check_in: searchParams.get('check_in') || '2025-07-06',
+    check_out: searchParams.get('check_out') || '2025-07-07',
+    guest_adults: Number(searchParams.get('guest_adults')) || 2,
+    guest_children: Number(searchParams.get('guest_children')) || 0,
     full_name: '',
     email: '',
     phone: '',
-    payment_method: 'MANUAL',
+    payment_method: 'MIDTRANS',
   });
 
+  const getTotalNights = () => {
+    const checkIn = new Date(form.check_in);
+    const checkOut = new Date(form.check_out);
+    const diff =
+      (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24);
+    return Math.max(diff, 1); // Minimal 1 malam
+  };
+
+  const getTotalPrice = () => {
+    const nights = getTotalNights();
+    return room ? room.base_price * nights : 0;
+  };
+
+  // const [form, setForm] = useState<CreateBookingInput>({
+  //   user_id: '08db47d4-6dd4-420d-a4e3-61dd9fcc2c56', // dari context auth / sementara hardcode
+  //   room_id: roomId as string,
+  //   check_in: '2025-09-13',
+  //   check_out: '2025-09-15',
+  //   guest_adults: 1,
+  //   guest_children: 1,
+  //   full_name: '',
+  //   email: '',
+  //   phone: '',
+  //   payment_method: 'MIDTRANS',
+  // });
+
   useEffect(() => {
-    const fetchRoom = async () => {
+    const fetchData = async () => {
+      const session = getClientSession();
+      if (!session || session.role !== 'TRAVELLER') {
+        router.push('/login');
+        return;
+      }
+
       try {
-        if (!roomId) {
-          console.warn('Room ID not found in params');
-          return;
-        }
-        const res = await getRoomById(roomId as string);
-        setRoom(res);
+        const roomData = await getRoomById(roomId as string);
+        console.log('roomId sent to API:', roomId); // Harus UUID
+
+        setRoom(roomData);
+        setForm((prev) => ({
+          ...prev,
+          user_id: session.id,
+          room_id: roomData.id,
+        }));
       } catch (error) {
-        console.error('Failed to fetch room:', error);
+        console.error('Room not found:', error);
+        setRoom(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRoom();
+    fetchData();
+  }, [roomId]);
+
+  // useEffect(() => {
+  //   const fetchRoom = async () => {
+  //     try {
+  //       if (!roomId) {
+  //         console.warn('Room ID not found in params');
+  //         return;
+  //       }
+  //       const res = await getRoomById(roomId as string);
+  //       setRoom(res);
+  //     } catch (error) {
+  //       console.error('Failed to fetch room:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchRoom();
+  // }, [roomId]);
+
+  useEffect(() => {
+    const session = getClientSession();
+    if (session?.role === 'TRAVELLER') {
+      setForm((prev) => ({
+        ...prev,
+        user_id: session.id,
+        room_id: roomId as string,
+      }));
+    } else {
+      alert('Unauthorized: Only TRAVELLER can book');
+      router.push('/login');
+    }
   }, [roomId]);
 
   const handleChange = (
@@ -58,7 +131,7 @@ export default function BookingConfirmationPage() {
 
   const handleSubmit = async () => {
     if (!form.full_name || !form.email || !form.phone) {
-      alert('Please complete all personal information');
+      alert('Please complete all required fields.');
       return;
     }
 
@@ -75,13 +148,40 @@ export default function BookingConfirmationPage() {
       } else {
         router.push(`/payment/${booking.id}`);
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Booking failed:', err);
       alert('Booking failed. Please try again.');
-      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // const handleSubmit = async () => {
+  //   if (!form.full_name || !form.email || !form.phone) {
+  //     alert('Please complete all personal information');
+  //     return;
+  //   }
+
+  //   setIsSubmitting(true);
+
+  //   try {
+  //     const booking = await createBooking(form);
+  //     if (form.payment_method === 'MIDTRANS') {
+  //       const res = await api.post('/payments/snap', {
+  //         bookingId: booking.id,
+  //       });
+  //       const { redirectUrl } = res.data;
+  //       window.location.href = redirectUrl;
+  //     } else {
+  //       router.push(`/payment/${booking.id}`);
+  //     }
+  //   } catch (error) {
+  //     alert('Booking failed. Please try again.');
+  //     console.error(error);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   if (loading) {
     return (
@@ -154,7 +254,7 @@ export default function BookingConfirmationPage() {
   const totalPrice = room.base_price + 789;
 
   return (
-    <div className="bg-blue-100 min-h-screen">
+    <div className="min-h-screen pt-15">
       <div className="max-w-7xl mx-auto px-7 py-17 grid grid-cols-1 md:grid-cols-2 gap-6 font-sans bg-gray-50 rounded-2xl shadow-lg">
         {/* Left: Form */}
         <div className="space-y-6">
@@ -307,18 +407,16 @@ export default function BookingConfirmationPage() {
 
             <p className="font-medium mt-4 text-gray-600">Price Breakdown</p>
             <p className="text-gray-600">
-              Rooms:{' '}
+              Rooms ({getTotalNights()} night{getTotalNights() > 1 ? 's' : ''}):{' '}
               <span className="float-right">
-                IDR {room.base_price.toLocaleString()}
+                IDR{' '}
+                {(room.base_price * getTotalNights()).toLocaleString('id-ID')}
               </span>
-            </p>
-            <p className="text-gray-600">
-              Transfer Tax: <span className="float-right">IDR 789</span>
             </p>
             <p className="font-bold mt-2 text-gray-600">
               Total:{' '}
               <span className="float-right">
-                IDR {totalPrice.toLocaleString()}
+                IDR {getTotalPrice().toLocaleString('id-ID')}
               </span>
             </p>
           </div>
