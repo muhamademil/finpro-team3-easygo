@@ -1,16 +1,16 @@
 import { redirect } from 'next/navigation';
 import { getServerSideSession } from '@/lib/session';
 
-export default async function BookingLayout({
+export default async function dashboardTraveller({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // const session = await getServerSideSession();
+  const session = await getServerSideSession();
 
-  // if (!session || session.role !== 'TRAVELLER') {
-  //   redirect('/login');
-  // }
+  if (!session || session.role !== 'TRAVELLER') {
+    redirect('/login');
+  }
 
   return (
     <div className="bg-white min-h-screen">

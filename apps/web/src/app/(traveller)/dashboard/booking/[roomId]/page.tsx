@@ -25,9 +25,9 @@ export default function BookingConfirmationPage() {
   const [form, setForm] = useState<CreateBookingInput>({
     user_id: '',
     room_id: '',
-    check_in: searchParams.get('check_in') || '2025-07-06',
-    check_out: searchParams.get('check_out') || '2025-07-07',
-    guest_adults: Number(searchParams.get('guest_adults')) || 2,
+    check_in: searchParams.get('check_in') || '2025-07-20',
+    check_out: searchParams.get('check_out') || '2025-07-22',
+    guest_adults: Number(searchParams.get('guest_adults')) || 1,
     guest_children: Number(searchParams.get('guest_children')) || 0,
     full_name: '',
     email: '',
@@ -115,7 +115,7 @@ export default function BookingConfirmationPage() {
         const { redirectUrl } = res.data;
         window.location.href = redirectUrl;
       } else {
-        router.push(`/payment/${booking.id}`);
+        router.push(`/dashboard/payment/${booking.id}`);
       }
     } catch (err) {
       console.error('Booking failed:', err);
@@ -316,14 +316,19 @@ export default function BookingConfirmationPage() {
 
         {/* Right: Summary */}
         <div className="bg-white rounded-xl shadow p-6 space-y-4">
-          <Image
-            src={
-              room.images?.[0]?.image_url ||
-              'https://via.placeholder.com/400x200'
-            }
-            alt="room"
-            className="rounded-lg w-full h-52 object-cover"
-          />
+          <div className="relative w-full h-52 rounded-lg overflow-hidden">
+            <Image
+              src={
+                room.images?.[0]?.image_url ||
+                'https://via.placeholder.com/400x200'
+              }
+              alt={room.name || 'Room Image'}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
+            />
+          </div>
           <h2 className="font-semibold text-lg text-gray-600">{room.name}</h2>
           <p className="text-sm text-gray-600">Max Guest: {room.max_guest}</p>
 

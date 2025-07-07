@@ -75,13 +75,14 @@ export default function MyBookingsPage() {
               key={id}
               className="border rounded-xl p-4 flex items-start gap-4 shadow-sm hover:shadow-md transition"
             >
-              {image && (
+              <div className="relative w-32 h-24 flex-shrink-0 rounded overflow-hidden">
                 <Image
                   src={image}
                   alt={property.name}
-                  className="w-32 h-24 rounded object-cover"
+                  fill
+                  className="object-cover"
                 />
-              )}
+              </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold">{room.name}</h2>
                 <p className="text-gray-600">
@@ -97,7 +98,7 @@ export default function MyBookingsPage() {
 
                 {status === 'COMPLETED' && !review && (
                   <button
-                    onClick={() => router.push(`/review/${id}`)}
+                    onClick={() => router.push(`/dashboard/review/${id}`)}
                     className="mt-3 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
                   >
                     Tulis Review
