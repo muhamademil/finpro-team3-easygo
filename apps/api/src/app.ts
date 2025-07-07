@@ -8,8 +8,20 @@ import express, {
   Router,
 } from 'express';
 import cors from 'cors';
-import { PORT } from './config';
-import { SampleRouter } from './routers/sample.router';
+import CONFIG from './config';
+import { AuthRouter } from './routers/auth.router';
+import { BookingRouter } from './routers/booking.router';
+import { RoomRouter } from './routers/room.router';
+import { PaymentRouter } from './routers/payment.router';
+import { ReviewRouter } from './routers/review.router';
+// import passport from 'passport';
+// import session from 'express-session';
+// import { configurePassport } from './lib/config/passport.config';
+import { PropertyRouter } from './routers/property.router';
+import { ResponseError } from './error/response.error';
+import { FacilityRouter } from './routers/facility.router';
+import { UploadRouter } from './routers/upload.router';
+import { TenantRouter } from './routers/tenant.router';
 
 export default class App {
   private app: Express;
@@ -28,21 +40,22 @@ export default class App {
   }
 
   private handleError(): void {
-    // not found
-    this.app.use((req: Request, res: Response, next: NextFunction) => {
-      if (req.path.includes('/api/')) {
-        res.status(404).send('Not found !');
-      } else {
-        next();
-      }
-    });
-
-    // error
     this.app.use(
       (err: Error, req: Request, res: Response, next: NextFunction) => {
         if (req.path.includes('/api/')) {
           console.error('Error : ', err.stack);
-          res.status(500).send('Error !');
+
+          if (err instanceof ResponseError) {
+            return res.status(err.status).json({
+              status: 'error',
+              message: err.message,
+            });
+          }
+
+          return res.status(500).json({
+            status: 'error',
+            message: 'Internal Server Error',
+          });
         } else {
           next();
         }
@@ -51,18 +64,31 @@ export default class App {
   }
 
   private routes(): void {
-    const sampleRouter = new SampleRouter();
+    const authRouter = new AuthRouter();
+    const propertyRouter = new PropertyRouter();
+    const facilityRouter = new FacilityRouter();
+    const uploadRouter = new UploadRouter();
+    const tenantRouter = new TenantRouter();
+    const paymentRouter = new PaymentRouter();
+    const bookingRouter = new BookingRouter();
+    const roomRouter = new RoomRouter();
+    const reviewRouter = new ReviewRouter();
 
-    this.app.get('/api', (req: Request, res: Response) => {
-      res.send(`Hello, Purwadhika Student API!`);
-    });
-
-    this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/api/auth', authRouter.getRouter());
+    this.app.use('/api/properties', propertyRouter.getRouter());
+    this.app.use('/api/facilities', facilityRouter.getRouter());
+    this.app.use('/api/uploads', uploadRouter.getRouter());
+    this.app.use('/api/tenant', tenantRouter.getRouter());
+    this.app.use('/api', bookingRouter.getRouter());
+    this.app.use('/api', roomRouter.getRouter());
+    this.app.use('/api', paymentRouter.getRouter());
+    this.app.use('/api/rooms', roomRouter.getRouter());
+    this.app.use('/api', reviewRouter.getRouter());
   }
 
   public start(): void {
-    this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
+    this.app.listen(CONFIG.PORT, () => {
+      console.log(`  ➜  [API] Local:   http://localhost:${CONFIG.PORT}/`);
     });
   }
 }

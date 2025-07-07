@@ -26,7 +26,7 @@ const InputForm = ({
 }: InputFormProps) => {
   return (
     <div className="flex flex-col gap-1 mt-4">
-      <label htmlFor={id} className="text-sm font-semibold text-slate-900">
+      <label htmlFor={id} className="text-sm font-semibold text-gray-700">
         {label}
       </label>
       <input
