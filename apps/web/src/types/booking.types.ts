@@ -43,6 +43,7 @@ export interface Booking {
   };
   payment?: {
     amount: number;
+    payment_proof_url?: string;
   };
 }
 
@@ -53,6 +54,7 @@ export interface BookingDetail {
   expires_at?: string;
   payment?: {
     amount: number;
+    payment_proof_url?: string;
   };
   room: {
     base_price: number;
@@ -77,7 +79,6 @@ export interface BookingCardData {
     date: string;
     proofUrl?: string;
   };
-  
 }
 
 export interface BookingDetailPayload {

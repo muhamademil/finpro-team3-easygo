@@ -48,12 +48,10 @@ export class PaymentController {
       const { bookingId } = req.params;
 
       const updated = await this.service.confirmManualPayment(bookingId);
-      res
-        .status(200)
-        .json({
-          message: 'Payment confirmed. Booking Completed.',
-          data: updated,
-        });
+      res.status(200).json({
+        message: 'Payment confirmed. Booking Completed.',
+        data: updated,
+      });
     } catch (error: any) {
       console.error(error);
       res.status(400).json({

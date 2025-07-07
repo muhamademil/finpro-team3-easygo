@@ -3,7 +3,6 @@ import { CreateBookingInput, UpdateBookingInput } from '@/types/booking.types';
 
 export class BookingService {
   public async createBooking(data: CreateBookingInput) {
-    // Ambil detail kamar
     const room = await prisma.room.findUnique({
       where: { id: data.room_id },
       select: { base_price: true },
@@ -13,7 +12,6 @@ export class BookingService {
       throw new Error('Room not found');
     }
 
-    // Hitung jumlah malam
     const checkIn = new Date(data.check_in);
     const checkOut = new Date(data.check_out);
     const nights =
@@ -23,11 +21,9 @@ export class BookingService {
       throw new Error('Invalid check-in/check-out date');
     }
 
-    // Hitung total
-    const fixedFee = 789; // pajak/biaya tetap
+    const fixedFee = 789;
     const totalPrice = room.base_price * nights + fixedFee;
 
-    // Buat booking
     const booking = await prisma.booking.create({
       data: {
         user: { connect: { id: data.user_id } },
@@ -51,7 +47,6 @@ export class BookingService {
       },
     });
 
-    // Bisa return total juga kalau ingin ditampilkan di frontend
     return {
       ...booking,
       total_price: totalPrice,
@@ -60,11 +55,23 @@ export class BookingService {
 
   public async findAllBooking() {
     return await prisma.booking.findMany({
-      include: { user: true, room: true },
+      include: { user: true, room: true, payment: true },
     });
   }
 
   public async findBookingById(id: string) {
+    const now = new Date();
+
+    await prisma.booking.updateMany({
+      where: {
+        status: 'CONFIRMED',
+        check_out: { lt: now },
+      },
+      data: {
+        status: 'COMPLETED',
+      },
+    });
+
     return await prisma.booking.findUnique({
       where: { id },
       include: {
@@ -109,6 +116,21 @@ export class BookingService {
   }
 
   public async findBookingsByUserId(userId: string) {
+    const now = new Date();
+
+    await prisma.booking.updateMany({
+      where: {
+        user_id: userId,
+        status: 'CONFIRMED',
+        check_out: {
+          lt: now,
+        },
+      },
+      data: {
+        status: 'COMPLETED',
+      },
+    });
+
     return await prisma.booking.findMany({
       where: { user_id: userId },
       include: {

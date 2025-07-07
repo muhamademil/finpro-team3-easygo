@@ -84,17 +84,22 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           <span className="text-gray-500">Payment Amount:</span> Rp
           {booking.payment?.amount?.toLocaleString() ?? '0'}
         </div>
-        {booking.payment_method === 'MANUAL' && booking.payment?.proofUrl ? (
-          <button
-            onClick={() => onShowProof(booking.payment!.proofUrl!)}
-            className="text-blue-600 hover:underline text-left"
-          >
-            View Payment Proof
-          </button>
+        {booking.payment_method === 'MANUAL' ? (
+          booking.payment?.proofUrl ? (
+            <button
+              onClick={
+                () => onShowProof(booking.payment!.proofUrl!)}
+              
+              className="text-blue-600 hover:underline text-left"
+            >
+              
+              View Payment Proof
+            </button>
+          ) : (
+            <p className="text-gray-500">Payment: Manual - waiting for proof</p>
+          )
         ) : (
-          <p>
-            <span className="text-gray-500">Payment:</span> by Midtrans
-          </p>
+          <p className="text-gray-500">Payment: by Midtrans</p>
         )}
       </CardContent>
       <CardFooter className="p-4 bg-gray-50">

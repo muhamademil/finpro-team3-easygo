@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createManualPayment } from '@/api/payment.service';
 import { getBookingDetail } from '@/api/booking.service';
+import { getUploadSignatureAPI } from '@/services/upload.service';
 import { Booking } from '@/types/booking.types';
 
 export default function ManualPaymentPage() {
@@ -15,7 +16,6 @@ export default function ManualPaymentPage() {
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  // Get booking detail
   useEffect(() => {
     const fetchBooking = async () => {
       try {
@@ -33,7 +33,6 @@ export default function ManualPaymentPage() {
     fetchBooking();
   }, [bookingId]);
 
-  // Countdown timer
   const startCountdown = (expiresAt: string) => {
     const countdown = setInterval(() => {
       const now = new Date().getTime();
@@ -72,30 +71,40 @@ export default function ManualPaymentPage() {
   const handleSubmit = async () => {
     try {
       if (!proofFile) return alert('Upload payment proof first');
-
       setUploading(true);
+
+      const { data: sig } = await getUploadSignatureAPI();
+
       const formData = new FormData();
       formData.append('file', proofFile);
-      formData.append('upload_preset', 'easygo'); // your cloudinary preset
+      formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
+      formData.append('timestamp', sig.data.timestamp);
+      formData.append('signature', sig.data.signature);
 
       const res = await fetch(
-        `https://api.cloudinary.com/v1_1/<your-cloud-name>/image/upload`,
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
         {
           method: 'POST',
           body: formData,
         },
       );
-      const data = await res.json();
-      const proofUrl = data.secure_url;
 
+      const data = await res.json();
+
+      const proofUrl = data.secure_url;
+      if (!proofUrl) {
+        alert('Upload ke Cloudinary gagal. Silakan coba lagi.');
+        setUploading(false);
+        return;
+      }
       await createManualPayment({
         booking_id: bookingId as string,
-        amount: getTotalPrice(), // sesuaikan dengan backend
+        amount: getTotalPrice(),
         payment_proof_url: proofUrl,
       });
 
       alert('Pembayaran berhasil dikirim');
-      router.push('/dashboard/booking/my-booking'); //ubah dengan masuk ke halaman dashboard atau riwayat pembayaran
+      router.push('/dashboard/booking/my-booking');
     } catch (err) {
       console.error(err);
       alert('Gagal melakukan pembayaran');

@@ -96,7 +96,7 @@ export default function MyBookingsPage() {
                   Status: {status.replace('_', ' ')}
                 </p>
 
-                {status === 'COMPLETED' && !review && (
+                {['CONFIRMED', 'COMPLETED'].includes(status) && !review && (
                   <button
                     onClick={() => router.push(`/dashboard/review/${id}`)}
                     className="mt-3 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"

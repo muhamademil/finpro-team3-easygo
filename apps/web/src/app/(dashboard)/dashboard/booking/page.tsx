@@ -39,6 +39,7 @@ export default function BookingPage() {
     const fetchData = async () => {
       try {
         const result: Booking[] = await getBookingsForTenant();
+
         const mapped = result.map<BookingCardData>((b) => ({
           id: b.id,
           check_in: b.check_in,
@@ -59,7 +60,7 @@ export default function BookingPage() {
             method: b.payment_method,
             proofUrl:
               b.payment_method === 'MANUAL'
-                ? '/uploads/payment.jpg'
+                ? (b.payment?.payment_proof_url ?? '')
                 : undefined,
           },
         }));
@@ -95,7 +96,7 @@ export default function BookingPage() {
           ['CONFIRMED', 'COMPLETED', 'CANCELLED'].includes(b.status),
         );
       } else if (subTab === 'Reject') {
-        list = []; // implement if needed
+        list = [];
       }
     } else {
       if (subTab === 'Antrian') {
@@ -146,6 +147,10 @@ export default function BookingPage() {
   };
 
   const handleShowProof = (url: string) => {
+    if (!url) {
+      alert('No proof URL available!');
+      return;
+    }
     setProofUrl(url);
     setIsModalOpen(true);
   };
@@ -154,7 +159,6 @@ export default function BookingPage() {
     <div>
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Booking</h1>
 
-      {/* Statistik */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         <BookingStatsCard
           title="Queue Payment"
@@ -194,7 +198,6 @@ export default function BookingPage() {
         />
       </div>
 
-      {/* Main Tabs */}
       <div className="flex border-b mb-6">
         {MAIN_TABS.map((tab) => (
           <button
@@ -211,7 +214,6 @@ export default function BookingPage() {
         ))}
       </div>
 
-      {/* Sub Tabs */}
       <div className="flex items-center gap-4 mb-6">
         {SUB_TABS.map((tab) => (
           <button
@@ -228,7 +230,6 @@ export default function BookingPage() {
         ))}
       </div>
 
-      {/* Booking Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredBookings.map((booking) => (
           <BookingCard
@@ -242,7 +243,6 @@ export default function BookingPage() {
         ))}
       </div>
 
-      {/* Modal Proof */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>

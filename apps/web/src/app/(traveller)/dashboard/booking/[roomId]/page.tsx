@@ -25,9 +25,9 @@ export default function BookingConfirmationPage() {
   const [form, setForm] = useState<CreateBookingInput>({
     user_id: '',
     room_id: '',
-    check_in: searchParams.get('check_in') || '2025-07-20',
-    check_out: searchParams.get('check_out') || '2025-07-22',
-    guest_adults: Number(searchParams.get('guest_adults')) || 1,
+    check_in: searchParams.get('check_in') || '2025-06-19',
+    check_out: searchParams.get('check_out') || '2025-06-22',
+    guest_adults: Number(searchParams.get('guest_adults')) || 2,
     guest_children: Number(searchParams.get('guest_children')) || 0,
     full_name: '',
     email: '',
@@ -58,7 +58,6 @@ export default function BookingConfirmationPage() {
 
       try {
         const roomData = await getRoomById(roomId as string);
-        console.log('roomId sent to API:', roomId);
 
         setRoom(roomData);
         setForm((prev) => ({
