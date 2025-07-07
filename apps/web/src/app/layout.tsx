@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import nextFontLocal from 'next/font/local';
+import localFont from 'next/font/local';
 import { MainNavbar } from '@/components/Layouts/MainNavbar';
 import { Footer } from '@/components/Layouts/Footer';
 
-const satoshi = nextFontLocal({
+const satoshi = localFont({
   src: [
     {
       path: './fonts/Satoshi/Satoshi-Regular.otf',
@@ -51,7 +51,7 @@ const satoshi = nextFontLocal({
   display: 'swap',
 });
 
-const clashGrotesk = nextFontLocal({
+const clashGrotesk = localFont({
   src: [
     {
       path: './fonts/ClashGrotesk/ClashGrotesk-Regular.otf',
