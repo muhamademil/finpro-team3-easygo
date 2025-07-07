@@ -80,7 +80,7 @@ const clashGrotesk = nextFontLocal({
 
 export const metadata: Metadata = {
   title: 'EasyGo - Booking Mudah',
-  description: 'Easy Booking. Easy Living',
+  description: 'Easy Booking. Easy Living. Easy Travelling.',
 };
 
 export default function RootLayout({
