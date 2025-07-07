@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Category } from '@/lib/type';
+import { Category } from '@/types/type';
 
 type CategoryCardProps = {
   category: Category;

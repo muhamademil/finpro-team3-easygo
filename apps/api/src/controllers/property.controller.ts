@@ -1,6 +1,9 @@
 import { PropertyService } from '@/services/property.service';
 import { Request, Response, NextFunction } from 'express';
-import { CreatePropertyInput } from '@/models/property.model';
+import {
+  CreatePropertyInput,
+  UpdatePropertyInput,
+} from '@/models/property.model';
 
 export class PropertyController {
   private propertyService: PropertyService = new PropertyService();
@@ -38,6 +41,48 @@ export class PropertyController {
 
       res.status(201).json({
         message: 'Properti baru berhasil dibuat!',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getPropertyById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { id } = req.params; // Ambil ID dari parameter URL
+      const result = await this.propertyService.getPropertyById(id);
+      res.status(200).json({
+        message: 'Detail properti berhasil diambil',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public updateProperty = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user!.id; // Ambil dari middleware
+      const propertyData: UpdatePropertyInput = req.body;
+
+      const result = await this.propertyService.updateProperty(
+        userId,
+        id,
+        propertyData,
+      );
+
+      res.status(200).json({
+        message: 'Properti berhasil diperbarui',
         data: result,
       });
     } catch (error) {

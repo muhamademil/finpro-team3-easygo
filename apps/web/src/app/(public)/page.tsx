@@ -1,26 +1,35 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { HeroSearchForm } from '@/components/Features/Homepage/Sections/HeroSection';
 import { HorizontalScrollingSection } from '@/components/Features/Homepage/Sections/HorizontalScrollingSection';
 
 import { DestinationCard } from '@/components/Features/Homepage/DestinationCard';
-import { Destination } from '@/lib/type';
+import { Destination } from '@/types/type';
 import { DESTINATIONS } from '@/constants/destination';
 
 import { PropertyCard } from '@/components/Features/Shared/PropertyCard';
-import { Property } from '@/lib/type';
+import { Property } from '@/types/type';
 
 import { CategorySection } from '@/components/Features/Homepage/Sections/CategorySection';
-import { FlashSaleSection } from '@/components/Features/Homepage/Sections/FlashSaleSection';
+// import { FlashSaleSection } from '@/components/Features/Homepage/Sections/FlashSaleSection';
 import { PromoSection } from '@/components/Features/Homepage/Sections/PromoSection';
 import { WhyChooseUsSection } from '@/components/Features/Homepage/Sections/WhyChooseUsSection';
 import { NewsletterSection } from '@/components/Features/Homepage/Sections/NewsletterSection';
 
-//Dummy Data
-import { properties } from '@/constants/dummy';
-import { cheapProperties } from '@/constants/dummy';
+import {
+  getBandungHitsAPI,
+  getCheapPropertiesAPI,
+  getRecommendedPropertiesAPI,
+} from '@/services/homepage.service';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [bandungHits, cheapProperties, recommendedProperties] =
+    await Promise.all([
+      getBandungHitsAPI(),
+      getCheapPropertiesAPI(),
+      getRecommendedPropertiesAPI(),
+    ]);
   return (
     <>
       <HeroSearchForm />
@@ -37,7 +46,11 @@ export default function HomePage() {
         title="Top Destinasi"
         subtitle="Lagi jadi incaran banyak orang nih!"
         items={DESTINATIONS}
-        renderItem={(city) => <DestinationCard city={city} />}
+        renderItem={(city) => (
+          <Link href={`/explore?city=${city.name}`}>
+            <DestinationCard city={city} />
+          </Link>
+        )}
       />
 
       <HorizontalScrollingSection<Property>
@@ -51,18 +64,23 @@ export default function HomePage() {
         }
         title="Hits di Bandung"
         subtitle="Spot paling dicari di Bandung! Bikin staycation kamu makin estetik dan asik."
-        items={properties}
+        items={bandungHits}
         renderItem={(property) => <PropertyCard property={property} />}
       />
 
       <CategorySection />
 
-      <FlashSaleSection />
+      <HorizontalScrollingSection<Property>
+        title="Rekomendasi Untukmu"
+        subtitle="Temukan permata tersembunyi yang kami pilihkan khusus untukmu."
+        items={recommendedProperties} // <-- Gunakan data dari API
+        renderItem={(property) => <PropertyCard property={property} />}
+      />
 
       <HorizontalScrollingSection<Property>
         title="Harga Murah"
         subtitle="Budget minim, vibes tetap maksimal! Pilihan properti terjangkau ada di sini."
-        items={cheapProperties}
+        items={cheapProperties} // <-- Gunakan data dari API
         renderItem={(property) => <PropertyCard property={property} />}
       />
 

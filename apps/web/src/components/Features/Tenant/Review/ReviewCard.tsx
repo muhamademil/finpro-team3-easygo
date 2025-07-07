@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { Review } from '@/lib/type';
+import type { Review } from '@/types/type';
 import Image from 'next/image';
 import { Building, Calendar, Star, Send } from 'lucide-react';
 import Button from '@/components/Elements/Button';

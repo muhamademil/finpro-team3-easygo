@@ -80,6 +80,7 @@ export default class App {
     this.app.use('/api', bookingRouter.getRouter());
     this.app.use('/api', roomRouter.getRouter());
     this.app.use('/api', paymentRouter.getRouter());
+    this.app.use('/api/rooms', roomRouter.getRouter());
   }
 
   public start(): void {

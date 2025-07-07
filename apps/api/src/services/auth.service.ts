@@ -104,11 +104,10 @@ export class AuthService {
     const tokenData = await prisma.registrationToken.findUnique({
       where: { token: completeRegisterRequest.token },
       include: {
-        user: true, // Ini akan membuat tokenData.user tersedia
+        user: true,
       },
     });
     if (!tokenData || !tokenData.user) {
-      // Pastikan token dan user ada
       throw new ResponseError(
         400,
         'Token registrasi tidak valid atau tidak ditemukan.',

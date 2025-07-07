@@ -7,7 +7,7 @@ import { getUploadSignatureAPI } from '@/services/upload.service';
 import { createPropertyAPI } from '@/services/property.service';
 import { getFacilitiesAPI } from '@/services/facilities.service';
 
-import { CreatePropertyInput } from '@/lib/type';
+import { CreatePropertyInput, Property } from '@/types/type';
 
 export type Facility = {
   id: string;
@@ -41,9 +41,7 @@ type FormErrors = Partial<
 
 type SubmitResult = {
   message: string;
-  data: {
-    id: string;
-  };
+  data: Property;
 };
 
 // Tipe untuk state dan actions di store kita
@@ -83,24 +81,25 @@ type ListingState = {
 
 const defaultCoords = { lat: -6.9175, lng: 107.6191 };
 
+const initialListingData: ListingData = {
+  propertyType: null,
+  title: '',
+  description: '',
+  address: '',
+  city: 'Bandung',
+  latitude: defaultCoords.lat,
+  longitude: defaultCoords.lng,
+  mainPhotos: [],
+  rooms: [{ id: uuidv4(), title: '', maxGuests: 2, price: 0, photo: null }],
+  facilities: [],
+};
+
 export const useListingStore = create<ListingState>((set, get) => ({
   currentStep: 1,
-  listingData: {
-    propertyType: null,
-    title: '',
-    description: '',
-    address: '',
-    city: 'Bandung',
-    latitude: defaultCoords.lat,
-    longitude: defaultCoords.lng,
-    mainPhotos: [],
-    rooms: [{ id: uuidv4(), title: '', maxGuests: 2, price: 0, photo: null }], // Mulai dengan 1 kamar kosong
-    facilities: [],
-  },
-
   errors: {},
   isLoading: false,
   masterFacilities: [],
+  listingData: initialListingData,
 
   fetchFacilities: async () => {
     try {
@@ -177,8 +176,6 @@ export const useListingStore = create<ListingState>((set, get) => ({
           name: room.title,
           base_price: room.price,
           max_guest: room.maxGuests,
-          // Di sini Anda perlu logika untuk mencocokkan foto kamar
-          // Untuk sementara, kita asumsikan urutannya sama
           imageUrl: room.photo ? roomImageUrls.shift() : undefined,
         })),
       };
@@ -191,7 +188,6 @@ export const useListingStore = create<ListingState>((set, get) => ({
       return response.data; // Kembalikan data properti yang baru dibuat
     } catch (error) {
       console.error('Error submitting listing:', error);
-      // PERBAIKAN #2: 'general' sekarang adalah key yang valid
       set({
         isLoading: false,
         errors: {

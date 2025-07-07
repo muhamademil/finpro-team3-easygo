@@ -8,13 +8,14 @@ export interface PropertyQueryParams {
   page?: string;
 }
 
-export type RoomInput = {
+export interface RoomInput {
   name: string;
   base_price: number;
   max_guest: number;
-};
+  imageUrl?: string;
+}
 
-export type CreatePropertyInput = {
+export interface CreatePropertyInput {
   name: string;
   description: string;
   address: string;
@@ -25,4 +26,6 @@ export type CreatePropertyInput = {
   rooms: RoomInput[];
   facilityIds: string[];
   imageUrls: string[];
-};
+}
+
+export type UpdatePropertyInput = Partial<CreatePropertyInput>;

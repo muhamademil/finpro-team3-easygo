@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import type { Booking } from '@/lib/type';
+import type { Booking } from '@/types/type';
 import { BookingCard } from '@/components/Features/Tenant/Booking/BookingCard';
 import { BookingStatsCard } from '@/components/Features/Tenant/Booking/BookingStatsCard';
 import {

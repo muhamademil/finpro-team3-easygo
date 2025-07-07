@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
-import { Destination } from '@/lib/type';
+import { Destination } from '@/types/type';
 
 type DestinationCardProps = {
   city: Destination;

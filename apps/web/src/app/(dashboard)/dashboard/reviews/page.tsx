@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import type { Review } from '@/lib/type';
+import type { Review } from '@/types/type';
 import { ReviewStats } from '@/components/Features/Tenant/Review/ReviewStats';
 import { ReviewCard } from '@/components/Features/Tenant/Review/ReviewCard';
 

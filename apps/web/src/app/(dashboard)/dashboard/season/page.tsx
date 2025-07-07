@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import PropertySelector from '@/components/Features/Tenant/Season/PropertySelector';
 import Calendar from '@/components/Features/Tenant/Season/Calendar';
 import PriceControlPanel from '@/components/Features/Tenant/Season/PriceControlPanel';
-import type { Propertyadd, PricingData } from '@/lib/type';
+import type { Propertyadd, PricingData } from '@/types/type';
 
 // Sample data with different base prices per property
 const properties: Propertyadd[] = [

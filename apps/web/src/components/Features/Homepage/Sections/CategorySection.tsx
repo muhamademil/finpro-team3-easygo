@@ -1,4 +1,4 @@
-import { Category } from '@/lib/type';
+import { Category } from '@/types/type';
 import { CategoryCard } from '../CategoryCard';
 
 const categories: Category[] = [

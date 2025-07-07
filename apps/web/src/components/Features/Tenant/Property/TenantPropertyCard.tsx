@@ -3,7 +3,7 @@
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import Image from 'next/image';
 import { Star, MapPin } from 'lucide-react';
-import type { Property } from '@/lib/type'; // Gunakan tipe terpusat
+import type { Property } from '@/types/type'; // Gunakan tipe terpusat
 import Button from '@/components/Elements/Button';
 import Link from 'next/link';
 

@@ -14,11 +14,18 @@ export class PropertyRouter {
   }
   private initializeRoutes(): void {
     this.router.get('/', this.propertyController.getProperties);
+    this.router.get('/:id', this.propertyController.getPropertyById);
     this.router.post(
       '/',
       authMiddleware,
       tenantMiddleware,
       this.propertyController.createProperty,
+    );
+    this.router.put(
+      '/:id',
+      authMiddleware,
+      tenantMiddleware,
+      this.propertyController.updateProperty,
     );
   }
 

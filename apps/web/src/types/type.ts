@@ -4,18 +4,37 @@ export type Destination = {
   image: string;
 };
 
+export type RoomData = {
+  id: string; // ID unik untuk mapping di React
+  title: string;
+  maxGuests: number;
+  price: number;
+  photo: File | null;
+};
+
 export interface Property {
-  id: number;
+  id: string;
   name: string;
   address: string;
+  description: string;
+  city: string;
+  latitude: number;
+  location: string;
+  longitude: number;
   images: ImageType[];
   rating: number | null;
   reviews: number;
   lowest_price: number;
   category: 'Villa' | 'Apartment' | 'House';
+  rooms: RoomData[];
+  facilities: {
+    // Struktur ini adalah hasil dari relasi many-to-many di Prisma
+    facility: Facility;
+  }[];
 }
 
 interface ImageType {
+  id: number;
   image_url: string;
 }
 
@@ -117,12 +136,60 @@ export type Booking = {
   status: BookingStatus;
 };
 
+// export type CreatePropertyInput = {
+//   name: string;
+//   description: string;
+//   address: string;
+//   city: string;
+//   latitude: number;
+//   longitude: number;
+//   category: 'VILLA' | 'APARTMENT' | 'GUEST_HOUSE';
+//   rooms: RoomInput[];
+//   facilityIds: string[];
+//   imageUrls: string[];
+// };
+
+export type Facility = {
+  id: string;
+  name: string;
+};
+
+export type Room = {
+  id: string;
+  title: string;
+  maxGuests: number;
+  price: number;
+  photo: string | null;
+};
+
+export type PropertyData = {
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  city: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  lowest_price: number;
+  category: string;
+  images: ImageType[];
+  rooms: Room[];
+  facilities: { facility: Facility }[];
+  rating?: number | null;
+  reviews?: number | null;
+};
+
+// Tipe untuk satu kamar yang dikirim saat membuat/update properti
 export type RoomInput = {
   name: string;
   base_price: number;
   max_guest: number;
+  // Kita tidak mengirim URL gambar kamar secara langsung di sini
+  // karena logika upload akan menanganinya
 };
 
+// Tipe untuk payload saat MEMBUAT properti baru
 export type CreatePropertyInput = {
   name: string;
   description: string;
@@ -132,6 +199,10 @@ export type CreatePropertyInput = {
   longitude: number;
   category: 'VILLA' | 'APARTMENT' | 'GUEST_HOUSE';
   rooms: RoomInput[];
-  facilityIds: string[];
-  imageUrls: string[];
+  facilityIds: string[]; // Hanya mengirim array ID fasilitas
+  imageUrls: string[]; // Hanya mengirim array URL gambar
 };
+
+// Tipe untuk payload saat MENGUPDATE properti
+// Menggunakan Partial<T> untuk membuat semua field menjadi opsional
+export type UpdatePropertyInput = Partial<CreatePropertyInput>;

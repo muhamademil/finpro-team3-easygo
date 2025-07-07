@@ -1,5 +1,5 @@
 // components/features/booking/BookingCard.tsx
-import type { Booking } from '@/lib/type';
+import type { Booking } from '@/types/type';
 import {
   Card,
   CardHeader,

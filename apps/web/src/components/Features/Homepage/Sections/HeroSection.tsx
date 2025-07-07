@@ -2,19 +2,56 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import { GuestPicker } from '@/components/Elements/Picker/GuestPicker';
-import { DateRangePicker } from '@/components/Elements/Picker/DateRangePicker';
+import {
+  GuestPicker,
+  GuestCount,
+} from '@/components/Elements/Picker/GuestPicker';
+import {
+  DateRangePicker,
+  DateRange,
+} from '@/components/Elements/Picker/DateRangePicker';
 import Button from '@/components/Elements/Button';
 
 export const HeroSearchForm = () => {
+  const router = useRouter();
   const [location, setLocation] = useState('Bandung');
+
+  const [dateRange, setDateRange] = useState<DateRange>({
+    startDate: new Date(),
+    endDate: new Date(),
+    key: 'selection',
+  });
+
+  const [guests, setGuests] = useState<GuestCount>({
+    adults: 2,
+    children: 0,
+  });
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // handle logic
-    console.log('Searching for:', location);
+
+    // Bangun query string dari semua state yang ada
+    const params = new URLSearchParams();
+
+    if (location) {
+      params.append('city', location);
+    }
+    if (dateRange.startDate) {
+      // Kirim tanggal dalam format YYYY-MM-DD
+      params.append('checkIn', dateRange.startDate.toISOString().split('T')[0]);
+    }
+    if (dateRange.endDate) {
+      params.append('checkOut', dateRange.endDate.toISOString().split('T')[0]);
+    }
+    if (guests.adults > 0) {
+      params.append('guests', (guests.adults + guests.children).toString());
+    }
+
+    // Arahkan ke halaman explore dengan query yang sudah dibuat
+    router.push(`/explore?${params.toString()}`);
   };
 
   return (
@@ -70,12 +107,12 @@ export const HeroSearchForm = () => {
               <label className="text-gray-500 text-sm mb-1 block">
                 Duration
               </label>
-              <DateRangePicker />
+              <DateRangePicker value={dateRange} onChange={setDateRange} />
             </div>
 
             <div>
               <label className="text-gray-500 text-sm mb-1 block">Guests</label>
-              <GuestPicker />
+              <GuestPicker value={guests} onChange={setGuests} />
             </div>
             <div className="flex items-end">
               <Button

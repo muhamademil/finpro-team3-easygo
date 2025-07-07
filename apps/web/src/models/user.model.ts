@@ -8,7 +8,7 @@ export interface CompleteRegistrationInput {
   name: string;
   password: string;
   phone: string;
-  photo_url?: string;
+  photo_url?: string | null;
   city?: string;
   bank_account?: string;
   bank_account_name?: string;

@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Propertyadd } from '@/lib/type';
+import type { Propertyadd } from '@/types/type';
 
 interface PropertySelectorProps {
   properties: Propertyadd[];

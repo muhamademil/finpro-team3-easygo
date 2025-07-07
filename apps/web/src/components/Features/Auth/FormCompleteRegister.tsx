@@ -9,6 +9,9 @@ import Button from '../../Elements/Button';
 import InputForm from '../../Elements/Input';
 import { completeRegistrationAPI } from '@/services/auth.service';
 import { CloudUpload, User } from 'lucide-react';
+import { getUploadSignatureAPI } from '@/services/upload.service';
+import { CompleteRegistrationInput } from '@/models/user.model';
+import { Loader2 } from 'lucide-react';
 
 type Props = {
   role: 'TRAVELLER' | 'TENANT';
@@ -32,6 +35,8 @@ export const CompleteRegisterForm = ({ role }: Props) => {
   const [bank_account, setBankAccount] = useState('');
   const [bank_account_name, setBankAccountName] = useState('');
 
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+
   useEffect(() => {
     const tokenFromUrl = searchParams.get('token');
     if (tokenFromUrl) {
@@ -45,14 +50,37 @@ export const CompleteRegisterForm = ({ role }: Props) => {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setIsUploadingPhoto(true);
+    setError(null);
+
+    try {
+      // 1. Minta "izin" (signature) dari backend kita
+      const { data: signatureData } = await getUploadSignatureAPI();
+
+      // 2. Siapkan data untuk dikirim ke Cloudinary
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
+      formData.append('signature', signatureData.data.signature);
+      formData.append('timestamp', signatureData.data.timestamp);
+
+      // 3. Upload langsung ke API Cloudinary
+      const cloudinaryResponse = await axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!}/image/upload`,
+        formData,
+      );
+
+      // 4. Simpan URL yang dikembalikan oleh Cloudinary ke state
+      setPhotoUrl(cloudinaryResponse.data.secure_url);
+    } catch (err) {
+      console.error('Gagal mengupload foto:', err);
+      setError('Gagal mengupload foto. Silakan coba lagi.');
+    } finally {
+      setIsUploadingPhoto(false);
     }
   };
 
@@ -67,12 +95,12 @@ export const CompleteRegisterForm = ({ role }: Props) => {
     setIsLoading(true);
     setError(null);
 
-    const payload = {
+    const payload: CompleteRegistrationInput = {
       token,
       name,
       password,
       phone,
-      photo_url: photoUrl ?? undefined,
+      photo_url: photoUrl,
       ...(role === 'TENANT' && { city, bank_account, bank_account_name }),
     };
 
@@ -81,7 +109,7 @@ export const CompleteRegisterForm = ({ role }: Props) => {
       alert(
         'Pendaftaran berhasil diselesaikan! Akun Anda kini aktif sepenuhnya.',
       );
-      router.push(role === 'TENANT' ? '/dashboard' : '/');
+      router.push(role === 'TENANT' ? '/dashboard' : '/login');
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(
@@ -118,7 +146,9 @@ export const CompleteRegisterForm = ({ role }: Props) => {
 
       <div className="flex justify-center items-center gap-4 mb-4">
         <div className="w-24 h-24 bg-white rounded-full overflow-hidden flex items-center justify-center">
-          {photoUrl ? (
+          {isUploadingPhoto ? (
+            <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+          ) : photoUrl ? (
             <Image
               src={photoUrl}
               alt="Uploaded Photo"
@@ -142,12 +172,13 @@ export const CompleteRegisterForm = ({ role }: Props) => {
             type="button"
             onClick={triggerFileSelect}
             variant="white"
-            className="flex items-center gap-2 py-8 bg-white text-slate-800"
+            className="flex items-center gap-2 py-2 px-4 bg-white text-slate-800"
+            disabled={isUploadingPhoto}
           >
             <CloudUpload size={16} />
-            Upload Photo
+            {isUploadingPhoto ? 'Uploading...' : 'Pilih Foto'}
           </Button>
-          <p className="text-xs mt-2">PNG, JPEG, maks 1Mb</p>
+          <p className="text-xs text-gray-500 mt-2">PNG, JPEG, maks 1Mb</p>
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 // src/controllers/room.controller.ts
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { RoomService } from '@/services/room.service';
 
 export class RoomController {
@@ -60,4 +60,34 @@ export class RoomController {
       res.status(500).json({ message: 'Failed to delete room', error });
     }
   }
+
+  public getAvailability = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { roomId } = req.params;
+      const { month, year } = req.query;
+
+      if (!month || !year) {
+        return res
+          .status(400)
+          .json({ message: 'Parameter month dan year diperlukan.' });
+      }
+
+      const result = await this.service.getRoomAvailability(
+        roomId,
+        Number(month),
+        Number(year),
+      );
+
+      res.status(200).json({
+        message: 'Ketersediaan kamar berhasil diambil',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

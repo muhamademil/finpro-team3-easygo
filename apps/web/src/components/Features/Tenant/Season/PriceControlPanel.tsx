@@ -13,7 +13,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import type { PercentageOption } from '@/lib/type';
+import type { PercentageOption } from '@/types/type';
 
 const percentageOptions: PercentageOption[] = [
   { value: '5', label: '5%' },
