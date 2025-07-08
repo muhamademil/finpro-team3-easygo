@@ -8,9 +8,15 @@ import { SOCIAL_LOGINS } from '@/constants/auth';
 import Image from 'next/image';
 import { initiateRegistrationAPI } from '@/services/auth.service';
 import axios from 'axios';
+import { googleLoginAPI } from '@/services/auth.service';
+import { useAuthStore, User } from '@/stores/useAuth.store';
+import { useRouter } from 'next/navigation';
+import { useGoogleLogin, TokenResponse } from '@react-oauth/google';
 
 type UserRole = 'TRAVELLER' | 'TENANT';
 const FormRegister = () => {
+  const router = useRouter();
+  const { setToken, setUser } = useAuthStore();
   // State form fields
   const [email, setEmail] = useState('');
 
@@ -19,6 +25,47 @@ const FormRegister = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleGoogleSuccess = async (
+    tokenResponse: Omit<
+      TokenResponse,
+      'error' | 'error_description' | 'error_uri'
+    >,
+  ) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await googleLoginAPI(tokenResponse.access_token);
+      const { token, user }: { token: string; user: User } = response.data.data;
+
+      setToken(token);
+      setUser(user);
+
+      alert('Login dengan Google berhasil!');
+      if (user.role === 'TENANT') {
+        router.push('/dashboard');
+      } else {
+        router.push('/');
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Gagal login dengan Google.');
+      } else {
+        setError('Terjadi kesalahan yang tidak terduga.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError('Login dengan Google gagal. Silakan coba lagi.');
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: handleGoogleError,
+  });
 
   // Handler form submission
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,7 +87,6 @@ const FormRegister = () => {
     } finally {
       setIsLoading(false);
     }
-    // call API
   };
 
   const baseTabClass = 'inline-block w-full p-4 border-b-2 rounded-t-lg';
@@ -132,19 +178,25 @@ const FormRegister = () => {
       </div>
       <div className="my-4 border-t border-dashed border-gray-300"></div>
 
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex sm:flex-row gap-2">
         {SOCIAL_LOGINS.map((social) => (
           <Button
             key={social.alt}
+            onClick={() => googleLogin()}
             className="w-full sm:flex-1 bg-white hover:bg-gray-100 cursor-pointer"
+            disabled={isLoading}
           >
-            <Image
-              src={social.src}
-              alt={social.alt}
-              width={social.width}
-              height={social.height}
-              className="mx-auto"
-            />
+            <div className="flex items-center justify-center">
+              <Image
+                src={social.src}
+                alt={social.alt}
+                width={social.width}
+                height={social.height}
+              />
+              <span className="text-gray-700 ml-3">
+                {isLoading ? 'Memproses...' : `Login dengan ${social.alt}`}
+              </span>
+            </div>
           </Button>
         ))}
       </div>

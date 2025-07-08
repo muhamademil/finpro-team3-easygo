@@ -21,17 +21,18 @@ import jwt from 'jsonwebtoken';
 import CONFIG from '@/config';
 import crypto from 'crypto';
 import React from 'react';
+import axios from 'axios';
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(CONFIG.GOOGLE_CLIENT_ID);
 
 export class AuthService {
-  // Fungsi ini menerima data, bukan req/res
   public async initiateRegistration(request: InitiateRegistrationInput) {
-    // 1. Validasi input menggunakan Zod (langkah selanjutnya).
     const InitiateRegisterRequest = Validation.validate(
       UserValidation.REGISTER,
       request,
     );
 
-    // 2. Cek apakah email sudah ada di database menggunakan Prisma.
     const existingUser = await prisma.user.findUnique({
       where: { email: InitiateRegisterRequest.email },
     });
@@ -170,6 +171,71 @@ export class AuthService {
       return updatedUser;
     });
     return user;
+  }
+
+  public async googleLogin(accessToken: string) {
+    try {
+      const googleResponse = await axios.get(
+        'https://www.googleapis.com/oauth2/v3/userinfo',
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const { email, name, picture } = googleResponse.data;
+
+      if (!email) {
+        throw new ResponseError(401, 'Gagal mendapatkan email dari Google.');
+      }
+
+      let user = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email,
+            name: name || 'Google User',
+            photo_url: picture,
+            provider: 'google',
+            is_verified: true,
+          },
+        });
+      } else {
+        if (user.provider !== 'google') {
+          throw new ResponseError(
+            409,
+            'Email ini sudah terdaftar menggunakan password.',
+          );
+        }
+      }
+
+      const jwtPayload = {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        is_verified: user.is_verified,
+      };
+      const localToken = jwt.sign(jwtPayload, CONFIG.JWT_SECRET, {
+        expiresIn: '1d',
+      });
+
+      const { password, ...userWithoutPassword } = user;
+
+      return {
+        token: localToken,
+        user: userWithoutPassword,
+      };
+    } catch (error) {
+      console.error('Error saat verifikasi token Google:', error);
+      throw new ResponseError(
+        401,
+        'Token Google tidak valid atau kedaluwarsa.',
+      );
+    }
   }
 
   public async login(request: LoginInput) {

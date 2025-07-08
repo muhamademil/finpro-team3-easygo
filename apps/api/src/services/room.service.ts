@@ -115,4 +115,81 @@ export class RoomService {
 
     return result;
   }
+  public async updateRoomAvailability(
+    roomId: string,
+    date: string,
+    isAvailable: boolean,
+  ) {
+    const dateObj = new Date(date);
+
+    return await prisma.roomAvailability.upsert({
+      where: {
+        room_id_date: {
+          room_id: roomId,
+          date: dateObj,
+        },
+      },
+      update: {
+        is_available: isAvailable,
+      },
+      create: {
+        room_id: roomId,
+        date: dateObj,
+        is_available: isAvailable,
+      },
+    });
+  }
+
+  public async updatePeakPrice(
+    roomId: string,
+    date: string,
+    type: 'PERCENT' | 'NOMINAL',
+    amount: number,
+  ) {
+    const dateObj = new Date(date);
+
+    return await prisma.peakPrice.upsert({
+      where: {
+        room_id_date: {
+          room_id: roomId,
+          date: dateObj,
+        },
+      },
+      update: {
+        type,
+        amount,
+      },
+      create: {
+        room_id: roomId,
+        date: dateObj,
+        type,
+        amount,
+      },
+    });
+  }
+
+  public async deletePeakPrice(roomId: string, date: string) {
+    const dateObj = new Date(date);
+
+    return await prisma.peakPrice.deleteMany({
+      where: {
+        room_id: roomId,
+        date: dateObj,
+      },
+    });
+  }
+
+  public async getRoomsByProperty(propertyId: string) {
+    return await prisma.room.findMany({
+      where: {
+        property_id: propertyId,
+      },
+      select: {
+        id: true,
+        name: true,
+        base_price: true,
+        max_guest: true,
+      },
+    });
+  }
 }

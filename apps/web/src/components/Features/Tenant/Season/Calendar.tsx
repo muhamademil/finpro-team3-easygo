@@ -3,16 +3,30 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import type { PricingData, CalendarDay } from '@/types/type';
+import type { CalendarDayData } from '@/types/season.type';
+
+interface CalendarDay {
+  date: number;
+  fullDate: Date;
+  dateString: string;
+  price: number;
+  isSelected: boolean;
+  isPast: boolean;
+  isToday: boolean;
+  isUnavailable: boolean;
+  isDisabled: boolean;
+  hasModification: boolean;
+  dayData?: CalendarDayData;
+}
 
 interface CalendarProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
   selectedDate: string | null;
-  onDateSelect: (dateString: string, savedData?: PricingData) => void;
-  selectedProperty: string;
+  onDateSelect: (dateString: string, dayData?: CalendarDayData) => void;
+  calendarData: CalendarDayData[];
   basePrice: number;
-  savedPricing: Record<string, PricingData>;
+  loading: boolean;
 }
 
 export default function Calendar({
@@ -20,9 +34,9 @@ export default function Calendar({
   onDateChange,
   selectedDate,
   onDateSelect,
-  selectedProperty,
+  calendarData,
   basePrice,
-  savedPricing,
+  loading,
 }: CalendarProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -53,12 +67,14 @@ export default function Calendar({
       days.push(null);
     }
 
+    // Create a map for quick lookup of calendar data
+    const dataMap = new Map(calendarData.map((d) => [d.date, d]));
+
     // Add actual days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const dateString = date.toISOString().split('T')[0];
-      const dateKey = `${selectedProperty}-${dateString}`;
-      const savedData = savedPricing[dateKey];
+      const dayData = dataMap.get(dateString);
 
       const isPast = date < today;
       const isSelected = selectedDate === dateString;
@@ -68,27 +84,11 @@ export default function Calendar({
       let isUnavailable = false;
       let hasModification = false;
 
-      // Apply saved pricing if exists
-      if (savedData) {
-        hasModification = true;
-        if (!savedData.isActive) {
-          isUnavailable = true;
-          displayPrice = 0;
-        } else if (
-          savedData.adjustmentType === 'nominal' &&
-          savedData.nominalAmount
-        ) {
-          displayPrice =
-            basePrice +
-            Number.parseInt(savedData.nominalAmount.replace(/\D/g, ''));
-        } else if (
-          savedData.adjustmentType === 'percentage' &&
-          savedData.percentageAmount
-        ) {
-          const increase =
-            basePrice * (Number.parseInt(savedData.percentageAmount) / 100);
-          displayPrice = basePrice + increase;
-        }
+      // Apply data from API if exists
+      if (dayData) {
+        displayPrice = dayData.price;
+        isUnavailable = !dayData.is_available;
+        hasModification = dayData.price !== basePrice || !dayData.is_available;
       }
 
       days.push({
@@ -102,7 +102,7 @@ export default function Calendar({
         isUnavailable,
         isDisabled: isPast,
         hasModification,
-        savedData,
+        dayData,
       });
     }
 
@@ -110,8 +110,8 @@ export default function Calendar({
   };
 
   const handleDateClick = (dateString: string, day: CalendarDay): void => {
-    if (day.isPast) return;
-    onDateSelect(dateString, day.savedData);
+    if (day.isDisabled) return;
+    onDateSelect(dateString, day.dayData);
   };
 
   const formatPrice = (price: number): string => {
@@ -133,6 +133,7 @@ export default function Calendar({
           size="sm"
           onClick={() => handleMonthChange('prev')}
           className="flex items-center space-x-2"
+          disabled={loading}
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Prev</span>
@@ -145,6 +146,7 @@ export default function Calendar({
           size="sm"
           onClick={() => handleMonthChange('next')}
           className="flex items-center space-x-2"
+          disabled={loading}
         >
           <span>Next</span>
           <ChevronRight className="w-4 h-4" />
@@ -152,7 +154,13 @@ export default function Calendar({
       </div>
 
       {/* Calendar */}
-      <div className="bg-white rounded-lg p-6">
+      <div className="bg-white rounded-lg p-6 relative">
+        {loading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        )}
+
         {/* Day Headers */}
         <div className="grid grid-cols-7 gap-2 mb-4">
           {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map((day) => (

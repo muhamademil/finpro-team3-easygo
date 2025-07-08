@@ -1,5 +1,6 @@
 import { AuthService } from '@/services/auth.service';
 import { Request, Response, NextFunction } from 'express';
+import { ResponseError } from '@/error/response.error';
 
 export class AuthController {
   private authService: AuthService = new AuthService();
@@ -10,20 +11,17 @@ export class AuthController {
     next: NextFunction,
   ) => {
     try {
-      // 1. Controller mengekstrak data dari request body
       const { email, role } = req.body;
 
-      // 2. Controller memanggil service HANYA dengan data yang relevan
       const result = await this.authService.initiateRegistration({
         email,
         role,
       });
 
-      // 3. Controller mengirim respon SUKSES berdasarkan apa yang dikembalikan service
       res.status(200).json({
         message:
           'Pendaftaran awal berhasil. Silakan cek email untuk melengkapi profil Anda.',
-        data: result, // Mengembalikan data jika ada (misal: untuk debugging)
+        data: result,
       });
     } catch (error) {
       next(error);
@@ -76,6 +74,26 @@ export class AuthController {
 
       res.status(200).json({
         message: 'Login berhasil',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public googleLogin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { accessToken } = req.body;
+      if (!accessToken) {
+        throw new ResponseError(400, 'Google access token tidak tersedia.');
+      }
+      const result = await this.authService.googleLogin(accessToken);
+      res.status(200).json({
+        message: 'Login dengan Google berhasil.',
         data: result,
       });
     } catch (error) {

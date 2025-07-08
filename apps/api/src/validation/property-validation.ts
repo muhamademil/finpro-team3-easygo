@@ -8,6 +8,7 @@ const RoomSchema = z.object({
   name: z.string().min(3, 'Nama kamar minimal 3 karakter'),
   base_price: z.number().positive('Harga harus angka positif'),
   max_guest: z.number().int().positive('Jumlah tamu harus angka positif'),
+  imageUrl: z.string().url('URL gambar kamar tidak valid').optional(),
 });
 
 export class PropertyValidation {

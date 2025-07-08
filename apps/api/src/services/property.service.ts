@@ -3,11 +3,23 @@ import { Prisma, PropertyCategory } from '@prisma/client';
 import {
   PropertyQueryParams,
   UpdatePropertyInput,
-} from '@/models/property.model'; // Impor tipe baru kita
+} from '@/models/property.model';
 import { Validation } from '@/validation/validation';
 import { PropertyValidation } from '@/validation/property-validation';
 import { ResponseError } from '@/error/response.error';
 import { CreatePropertyInput, RoomInput } from '@/models/property.model';
+
+type PrismaTx = Omit<
+  Prisma.TransactionClient,
+  | '$use'
+  | '$on'
+  | '$connect'
+  | '$disconnect'
+  | '$executeRaw'
+  | '$queryRaw'
+  | '$transaction'
+  | '$extends'
+>;
 
 export class PropertyService {
   public async getProperties(queryParams: PropertyQueryParams) {
@@ -23,45 +35,48 @@ export class PropertyService {
 
     const take = parseInt(limit);
 
-    // --- Logika untuk sortBy=popularity ---
-    if (sortBy === 'popularity') {
-      const whereClause = city
-        ? Prisma.sql`WHERE p.city ILIKE ${'%' + city + '%'}`
-        : Prisma.empty;
+    if (sortBy === 'popularity' && city) {
+      const propertyIdsInCity = await prisma.property.findMany({
+        where: {
+          city: {
+            contains: city,
+            mode: 'insensitive',
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
 
-      const popularPropertyIds: { id: string }[] = await prisma.$queryRaw`
-        SELECT p.id
-        FROM "properties" p
-        JOIN "rooms" r ON p.id = r.property_id
-        JOIN "bookings" b ON r.id = b.room_id
-        ${whereClause}
-        GROUP BY p.id
-        ORDER BY COUNT(b.id) DESC
-        LIMIT ${take};
-      `;
-
-      if (popularPropertyIds.length === 0) {
+      if (propertyIdsInCity.length === 0) {
         return {
           properties: [],
           pagination: { total: 0, page: 1, limit: take, totalPages: 0 },
         };
       }
 
-      const ids = popularPropertyIds.map((p) => p.id);
+      const shuffledIds = propertyIdsInCity.sort(() => Math.random() - 0.5);
+
+      const randomIds = shuffledIds.slice(0, take).map((p) => p.id);
+
       const properties = await prisma.property.findMany({
-        where: { id: { in: ids } },
-        // PERBAIKAN: Tambahkan include untuk facilities
+        where: {
+          id: {
+            in: randomIds,
+          },
+        },
         include: {
           images: { take: 1 },
           facilities: {
-            take: 3, // Ambil 3 fasilitas utama
+            take: 3,
             include: {
               facility: true,
             },
           },
         },
       });
-      const sortedProperties = ids
+
+      const sortedProperties = randomIds
         .map((id) => properties.find((p) => p.id === id))
         .filter(Boolean);
 
@@ -76,7 +91,6 @@ export class PropertyService {
       };
     }
 
-    // --- Logika untuk type=random ---
     if (type === 'random') {
       const allPropertyIds = await prisma.property.findMany({
         select: { id: true },
@@ -92,7 +106,6 @@ export class PropertyService {
       const randomIds = shuffledIds.slice(0, take).map((p) => p.id);
       const randomProperties = await prisma.property.findMany({
         where: { id: { in: randomIds } },
-        // PERBAIKAN: Tambahkan include untuk facilities
         include: {
           images: { take: 1 },
           facilities: {
@@ -115,7 +128,6 @@ export class PropertyService {
       };
     }
 
-    // --- Logika Filter & Sort Biasa ---
     const where: Prisma.PropertyWhereInput = {};
     if (city) {
       where.city = { contains: city, mode: 'insensitive' };
@@ -142,7 +154,6 @@ export class PropertyService {
         orderBy: orderByClause,
         take,
         skip,
-        // PERBAIKAN: Tambahkan include untuk facilities
         include: {
           images: { take: 1 },
           facilities: {
@@ -176,7 +187,6 @@ export class PropertyService {
       propertyData,
     );
 
-    // 1. Cari record Tenant berdasarkan userId yang login
     const tenant = await prisma.tenant.findUnique({
       where: { user_id: userId },
     });
@@ -188,9 +198,7 @@ export class PropertyService {
       );
     }
 
-    // 2. Gunakan transaksi untuk memastikan semua data berhasil dibuat
-    const newProperty = await prisma.$transaction(async (tx) => {
-      // a. Buat record Property utama
+    const newProperty = await prisma.$transaction(async (tx: PrismaTx) => {
       const property = await tx.property.create({
         data: {
           tenant_id: tenant.id,
@@ -201,7 +209,6 @@ export class PropertyService {
           latitude: validatedData.latitude,
           longitude: validatedData.longitude,
           category: validatedData.category,
-          // Hitung harga terendah dari kamar yang diinput
           lowest_price: Math.min(
             ...validatedData.rooms.map((r) => r.base_price),
           ),
@@ -209,7 +216,6 @@ export class PropertyService {
       });
 
       for (const roomData of validatedData.rooms) {
-        // Buat record Room untuk setiap item di array
         const newRoom = await tx.room.create({
           data: {
             property_id: property.id,
@@ -219,7 +225,6 @@ export class PropertyService {
           },
         });
 
-        // Jika ada URL gambar untuk kamar ini, buat record RoomImage
         if (roomData.imageUrl) {
           await tx.roomImage.create({
             data: {
@@ -230,7 +235,6 @@ export class PropertyService {
         }
       }
 
-      // c. Hubungkan semua fasilitas
       await tx.propertyFacility.createMany({
         data: validatedData.facilityIds.map((id: string) => ({
           property_id: property.id,
@@ -238,7 +242,6 @@ export class PropertyService {
         })),
       });
 
-      // d. Simpan semua URL gambar
       await tx.propertyImage.createMany({
         data: validatedData.imageUrls.map((url: string) => ({
           property_id: property.id,
@@ -246,25 +249,11 @@ export class PropertyService {
         })),
       });
 
-      // Ambil kembali data properti yang baru dibuat beserta relasinya untuk dikirim sebagai respon
-      const result = await tx.property.findUnique({
-        where: { id: property.id },
-        include: {
-          images: true,
-          rooms: true,
-          facilities: {
-            include: {
-              facility: true,
-            },
-          },
-        },
-      });
-
       return tx.property.findUnique({
         where: { id: property.id },
         include: {
           images: true,
-          rooms: { include: { images: true } }, // Sertakan juga gambar kamar
+          rooms: { include: { images: true } },
           facilities: { include: { facility: true } },
         },
       });
