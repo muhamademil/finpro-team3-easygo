@@ -25,8 +25,8 @@ export default function BookingConfirmationPage() {
   const [form, setForm] = useState<CreateBookingInput>({
     user_id: '',
     room_id: '',
-    check_in: searchParams.get('check_in') || '2025-06-19',
-    check_out: searchParams.get('check_out') || '2025-06-22',
+    check_in: searchParams.get('check_in') || '2025-07-08',
+    check_out: searchParams.get('check_out') || '2025-07-09',
     guest_adults: Number(searchParams.get('guest_adults')) || 2,
     guest_children: Number(searchParams.get('guest_children')) || 0,
     full_name: '',

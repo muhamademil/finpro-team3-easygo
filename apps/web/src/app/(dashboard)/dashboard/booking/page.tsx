@@ -40,7 +40,12 @@ export default function BookingPage() {
       try {
         const result: Booking[] = await getBookingsForTenant();
 
-        const mapped = result.map<BookingCardData>((b) => ({
+        const sorted = [...result].sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        );
+
+        const mapped = sorted.map<BookingCardData>((b) => ({
           id: b.id,
           check_in: b.check_in,
           check_out: b.check_out,
@@ -64,6 +69,7 @@ export default function BookingPage() {
                 : undefined,
           },
         }));
+
         setBookings(mapped);
       } catch (err) {
         console.error('Failed to load tenant bookings:', err);
@@ -114,14 +120,7 @@ export default function BookingPage() {
     try {
       const updated = await approveBooking(id);
       setBookings((prev) =>
-        prev.map((b) =>
-          b.id === id
-            ? {
-                ...b,
-                status: mainTab === 'Payments' ? 'CONFIRMED' : 'COMPLETED',
-              }
-            : b,
-        ),
+        prev.map((b) => (b.id === id ? { ...b, status: updated.status } : b)),
       );
     } catch (err) {
       console.error('Failed to approve booking:', err);
