@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "src/index.serverless.ts",
+      "src": "dist/index.serverless.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/index.serverless.ts"
+      "dest": "dist/index.serverless.ts"
     }
   ]
 }
