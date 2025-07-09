@@ -1,13 +1,13 @@
-import { prisma } from '../lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { Prisma, PropertyCategory } from '@prisma/client';
 import {
   PropertyQueryParams,
   UpdatePropertyInput,
-} from '../models/property.model';
-import { Validation } from '../validation/validation';
-import { PropertyValidation } from '../validation/property-validation';
-import { ResponseError } from '../error/response.error';
-import { CreatePropertyInput, RoomInput } from '../models/property.model';
+} from '@/models/property.model';
+import { Validation } from '@/validation/validation';
+import { PropertyValidation } from '@/validation/property-validation';
+import { ResponseError } from '@/error/response.error';
+import { CreatePropertyInput, RoomInput } from '@/models/property.model';
 
 type PrismaTx = Omit<
   Prisma.TransactionClient,

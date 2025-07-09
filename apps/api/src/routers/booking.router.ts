@@ -1,8 +1,8 @@
 // src/routers/booking.router.ts
 import { Router } from 'express';
-import { BookingController } from '../controllers/booking.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { tenantMiddleware } from '../middleware/tenant.middleware';
+import { BookingController } from '@/controllers/booking.controller';
+import { authMiddleware } from '@/middleware/auth.middleware';
+import { tenantMiddleware } from '@/middleware/tenant.middleware';
 
 export class BookingRouter {
   private router = Router();

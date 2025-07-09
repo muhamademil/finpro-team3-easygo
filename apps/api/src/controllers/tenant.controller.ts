@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { TenantService } from '../services/tenant.service';
+import { TenantService } from '@/services/tenant.service';
 
 export class TenantController {
   private tenantService: TenantService = new TenantService();

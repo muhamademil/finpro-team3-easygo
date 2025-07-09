@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UploadService } from '../services/upload.service';
+import { UploadService } from '@/services/upload.service';
 
 export class UploadController {
   private uploadService: UploadService = new UploadService();

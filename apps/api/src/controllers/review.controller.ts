@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ReviewService } from '../services/review.service';
+import { ReviewService } from '@/services/review.service';
 
 export class ReviewController {
   private service = new ReviewService();

@@ -1,9 +1,9 @@
-import { PropertyService } from '../services/property.service';
+import { PropertyService } from '@/services/property.service';
 import { Request, Response, NextFunction } from 'express';
 import {
   CreatePropertyInput,
   UpdatePropertyInput,
-} from '../models/property.model';
+} from '@/models/property.model';
 
 export class PropertyController {
   private propertyService: PropertyService = new PropertyService();

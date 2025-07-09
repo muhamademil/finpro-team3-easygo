@@ -1,21 +1,21 @@
-import { Validation } from '../validation/validation';
-import { UserValidation } from '../validation/user-validation';
-import { sendMail } from '../lib/mail';
-import { prisma, PrismaTx } from '../lib/prisma';
-import { RegistrationEmail } from '../lib/utils/templates/RegistrationEmail';
-import { ForgotPasswordEmail } from '../lib/utils/templates/ForgotPasswordEmail';
+import { Validation } from '@/validation/validation';
+import { UserValidation } from '@/validation/user-validation';
+import { sendMail } from '@/lib/mail';
+import { prisma, PrismaTx } from '@/lib/prisma';
+import { RegistrationEmail } from '@/lib/utils/templates/RegistrationEmail';
+import { ForgotPasswordEmail } from '@/lib/utils/templates/ForgotPasswordEmail';
 import {
   CompleteRegistrationInput,
   InitiateRegistrationInput,
   LoginInput,
   ForgotPasswordInput,
   ResetPasswordInput,
-} from '../models/user.model';
-import { ResponseError } from '../error/response.error';
+} from '@/models/user.model';
+import { ResponseError } from '@/error/response.error';
 import {
   comparePassword,
   hashPassword,
-} from '../lib/utils/helper/password-hash.helper';
+} from '@/lib/utils/helper/password-hash.helper';
 
 import jwt from 'jsonwebtoken';
 import CONFIG from '@/config';

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { RoomController } from '../controllers/room.controller';
+import { RoomController } from '@/controllers/room.controller';
 
 export class RoomRouter {
   private router = Router();

@@ -1,5 +1,5 @@
 import { ZodType, ZodError } from 'zod';
-import { ResponseError } from '../error/response.error';
+import { ResponseError } from '@/error/response.error';
 
 export class Validation {
   static validate<T>(schema: ZodType, data: T): T {

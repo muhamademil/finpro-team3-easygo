@@ -1,6 +1,6 @@
 import { prisma } from '@/prisma/client';
 import { Review } from '@prisma/client';
-import { CreateReviewInput } from '../types/riview.type';
+import { CreateReviewInput } from '@/types/riview.type';
 
 export class ReviewService {
   public async createReview(data: CreateReviewInput): Promise<Review> {

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { FacilityService } from '../services/facility.service';
+import { FacilityService } from '@/services/facility.service';
 
 export class FacilityController {
   private facilityService: FacilityService = new FacilityService();

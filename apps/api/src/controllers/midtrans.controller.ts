@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { MidtransService } from '../services/midtrans.service';
+import { MidtransService } from '@/services/midtrans.service';
 
 export class MidtransController {
   private service = new MidtransService();

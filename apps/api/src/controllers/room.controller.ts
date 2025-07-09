@@ -1,6 +1,6 @@
 // src/controllers/room.controller.ts
 import { Request, Response, NextFunction } from 'express';
-import { RoomService } from '../services/room.service';
+import { RoomService } from '@/services/room.service';
 
 export class RoomController {
   private service = new RoomService();

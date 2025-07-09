@@ -1,5 +1,5 @@
-import { prisma } from '../lib/prisma';
-import { ResponseError } from '../error/response.error';
+import { prisma } from '@/lib/prisma';
+import { ResponseError } from '@/error/response.error';
 
 export class TenantService {
   public async getPropertiesByTenant(userId: string) {

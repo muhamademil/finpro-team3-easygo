@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { PropertyController } from '../controllers/property.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { tenantMiddleware } from '../middleware/tenant.middleware';
+import { PropertyController } from '@/controllers/property.controller';
+import { authMiddleware } from '@/middleware/auth.middleware';
+import { tenantMiddleware } from '@/middleware/tenant.middleware';
 
 export class PropertyRouter {
   private router: Router;

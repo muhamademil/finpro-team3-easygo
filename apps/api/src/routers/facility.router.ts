@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { FacilityController } from '../controllers/facility.controller';
+import { FacilityController } from '@/controllers/facility.controller';
 
 export class FacilityRouter {
   private router: Router;

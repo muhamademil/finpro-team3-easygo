@@ -9,16 +9,16 @@ import express, {
 } from 'express';
 import cors from 'cors';
 import CONFIG from './config';
-import { AuthRouter } from './routers/auth.router';
-import { BookingRouter } from './routers/booking.router';
-import { RoomRouter } from './routers/room.router';
-import { PaymentRouter } from './routers/payment.router';
-import { ReviewRouter } from './routers/review.router';
-import { PropertyRouter } from './routers/property.router';
-import { ResponseError } from './error/response.error';
-import { FacilityRouter } from './routers/facility.router';
-import { UploadRouter } from './routers/upload.router';
-import { TenantRouter } from './routers/tenant.router';
+import { AuthRouter } from '@/routers/auth.router';
+import { BookingRouter } from '@/routers/booking.router';
+import { RoomRouter } from '@/routers/room.router';
+import { PaymentRouter } from '@/routers/payment.router';
+import { ReviewRouter } from '@/routers/review.router';
+import { PropertyRouter } from '@/routers/property.router';
+import { ResponseError } from '@/error/response.error';
+import { FacilityRouter } from '@/routers/facility.router';
+import { UploadRouter } from '@/routers/upload.router';
+import { TenantRouter } from '@/routers/tenant.router';
 
 export default class App {
   private app: Express;

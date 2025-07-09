@@ -1,5 +1,5 @@
-import { prisma } from '../prisma/client';
-import { CreateBookingInput, UpdateBookingInput } from '../types/booking.types';
+import { prisma } from '@/prisma/client';
+import { CreateBookingInput, UpdateBookingInput } from '@/types/booking.types';
 
 export class BookingService {
   public async createBooking(data: CreateBookingInput) {
