@@ -135,7 +135,7 @@ export default function BookingPage() {
           b.id === id
             ? {
                 ...b,
-                status: 'CANCELLED',
+                status: updated.status,
               }
             : b,
         ),
