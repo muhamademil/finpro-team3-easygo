@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getMyPropertiesAPI } from '@/services/tenant.service';
 import SeasonClientPage from './SeasonClientPage';
 
