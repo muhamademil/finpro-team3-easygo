@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -5,16 +8,14 @@ import { HeroSearchForm } from '@/components/Features/Homepage/Sections/HeroSect
 import { HorizontalScrollingSection } from '@/components/Features/Homepage/Sections/HorizontalScrollingSection';
 
 import { DestinationCard } from '@/components/Features/Homepage/DestinationCard';
-import { Destination } from '@/types/type';
 import { DESTINATIONS } from '@/constants/destination';
-
-import { PropertyCard } from '@/components/Features/Shared/PropertyCard';
-import { Property } from '@/types/type';
-
 import { CategorySection } from '@/components/Features/Homepage/Sections/CategorySection';
 import { PromoSection } from '@/components/Features/Homepage/Sections/PromoSection';
 import { WhyChooseUsSection } from '@/components/Features/Homepage/Sections/WhyChooseUsSection';
 import { NewsletterSection } from '@/components/Features/Homepage/Sections/NewsletterSection';
+
+import { Property } from '@/types/type';
+import { PropertyCard } from '@/components/Features/Shared/PropertyCard';
 
 import {
   getBandungHitsAPI,
@@ -22,18 +23,40 @@ import {
   getRecommendedPropertiesAPI,
 } from '@/services/homepage.service';
 
-export default async function HomePage() {
-  const [bandungHits, cheapProperties, recommendedProperties] =
-    await Promise.all([
-      getBandungHitsAPI(),
-      getCheapPropertiesAPI(),
-      getRecommendedPropertiesAPI(),
-    ]);
+export default function HomePage() {
+  const [bandungHits, setBandungHits] = useState<Property[]>([]);
+  const [cheapProperties, setCheapProperties] = useState<Property[]>([]);
+  const [recommendedProperties, setRecommendedProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [hits, cheap, recommended] = await Promise.all([
+          getBandungHitsAPI(),
+          getCheapPropertiesAPI(),
+          getRecommendedPropertiesAPI(),
+        ]);
+        setBandungHits(hits);
+        setCheapProperties(cheap);
+        setRecommendedProperties(recommended);
+      } catch (error) {
+        console.error('Gagal mengambil data homepage:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="text-center py-10">Loading...</div>;
+
   return (
     <>
       <HeroSearchForm />
 
-      <HorizontalScrollingSection<Destination>
+      <HorizontalScrollingSection
         icon={
           <Image
             src="https://res.cloudinary.com/dohpngcuj/image/upload/v1750674187/topdestination_op2jle.png"
@@ -52,7 +75,7 @@ export default async function HomePage() {
         )}
       />
 
-      <HorizontalScrollingSection<Property>
+      <HorizontalScrollingSection
         icon={
           <Image
             src="https://res.cloudinary.com/dohpngcuj/image/upload/v1750705248/HitsIcon_hcwhun.png"
@@ -69,24 +92,22 @@ export default async function HomePage() {
 
       <CategorySection />
 
-      <HorizontalScrollingSection<Property>
+      <HorizontalScrollingSection
         title="Rekomendasi Untukmu"
         subtitle="Temukan permata tersembunyi yang kami pilihkan khusus untukmu."
-        items={recommendedProperties} // <-- Gunakan data dari API
+        items={recommendedProperties}
         renderItem={(property) => <PropertyCard property={property} />}
       />
 
-      <HorizontalScrollingSection<Property>
+      <HorizontalScrollingSection
         title="Harga Murah"
         subtitle="Budget minim, vibes tetap maksimal! Pilihan properti terjangkau ada di sini."
-        items={cheapProperties} // <-- Gunakan data dari API
+        items={cheapProperties}
         renderItem={(property) => <PropertyCard property={property} />}
       />
 
       <PromoSection />
-
       <WhyChooseUsSection />
-
       <NewsletterSection />
     </>
   );

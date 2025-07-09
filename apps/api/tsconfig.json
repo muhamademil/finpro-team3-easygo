@@ -14,7 +14,7 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "src/middleware/auth.middleware.ts", "src/middleware/tenant.middleware.ts", "src/middleware/auth.middleware.js", "src/middleware/tenant.middleware.js"],
   // "include": ["**/*.ts", "src/lib/utils/templates/RegistrationEmail.tsx"],
   "exclude": ["node_modules","prisma","api"]
 }
