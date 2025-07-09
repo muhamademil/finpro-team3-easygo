@@ -30,9 +30,9 @@ export class RoomRouter {
       '/rooms/:id',
       this.controller.deleteRoom.bind(this.controller),
     );
-    this.router.get('/:roomId/availability', this.controller.getAvailability);
+    this.router.get('/rooms/:roomId/availability', this.controller.getAvailability);
     // Availability endpoints
-    this.router.get('/:roomId/availability', this.controller.getAvailability);
+    this.router.get('/rooms/:roomId/availability', this.controller.getAvailability);
     this.router.put(
       '/:roomId/availability',
       this.controller.updateAvailability,

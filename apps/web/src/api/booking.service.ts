@@ -8,6 +8,7 @@ import {
 export const createBooking = async (
   data: CreateBookingInput,
 ): Promise<Booking> => {
+  console.log('Sending booking data:', data);
   const response = await api.post('/bookings', data);
   return response.data.data;
 };

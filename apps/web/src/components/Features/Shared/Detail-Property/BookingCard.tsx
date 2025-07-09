@@ -17,6 +17,7 @@ import {
   getRoomAvailabilityAPI,
   RoomAvailabilityData,
 } from '@/services/room.service';
+import { useRouter } from 'next/navigation';
 
 interface BookingCardProps {
   basePrice: number;
@@ -51,6 +52,7 @@ export default function BookingCard({
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
   const [availability, setAvailability] = useState<RoomAvailabilityData[]>([]);
   const [isLoadingCalendar, setIsLoadingCalendar] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!selectedRoom || !showCalendar) return;
@@ -148,16 +150,6 @@ export default function BookingCard({
     }
   };
 
-  //   const handleMonthChange = (direction: 'prev' | 'next') => {
-  //     const newDate = new Date(currentCalendarDate);
-  //     if (direction === 'prev') {
-  //       newDate.setMonth(currentCalendarDate.getMonth() - 1);
-  //     } else {
-  //       newDate.setMonth(currentCalendarDate.getMonth() + 1);
-  //     }
-  //     setCurrentCalendarDate(newDate);
-  //   };
-
   const handleMonthChange = (direction: 'prev' | 'next') => {
     setCurrentCalendarDate((prevDate) => {
       const newDate = new Date(prevDate);
@@ -191,48 +183,6 @@ export default function BookingCard({
     return { roomPrice, serviceFee, tax, total, nights: daysInRange.length };
   };
 
-  //   const calculatePriceBreakdown = () => {
-  //     if (!selectedRoom || !checkInDate || !checkOutDate) return null;
-
-  //     // Calculate price for each day in the range
-  //     const days: CalendarDay[] = [];
-  //     const currentDate = new Date(checkInDate);
-
-  //     while (currentDate < checkOutDate) {
-  //       const isWeekend =
-  //         currentDate.getDay() === 0 || currentDate.getDay() === 6;
-  //       const baseRoomPrice = selectedRoom.base_price;
-  //       const price = isWeekend ? Math.round(baseRoomPrice * 1.3) : baseRoomPrice;
-
-  //       days.push({
-  //         date: new Date(currentDate),
-  //         price,
-  //         isAvailable: true,
-  //         isSelected: false,
-  //         isCheckIn: false,
-  //         isCheckOut: false,
-  //         isBetween: false,
-  //         isPast: false,
-  //         isToday: false,
-  //       });
-
-  //       currentDate.setDate(currentDate.getDate() + 1);
-  //     }
-
-  //     const roomPrice = days.reduce((total, day) => total + day.price, 0);
-  //     const serviceFee = Math.round(roomPrice * 0.05);
-  //     const tax = Math.round(roomPrice * 0.11);
-  //     const total = roomPrice + serviceFee + tax;
-
-  //     return {
-  //       roomPrice,
-  //       serviceFee,
-  //       tax,
-  //       total,
-  //       nights: days.length,
-  //     };
-  //   };
-
   const priceBreakdown = useMemo(calculatePriceBreakdown, [
     checkInDate,
     checkOutDate,
@@ -261,21 +211,13 @@ export default function BookingCard({
   const handleFinalBooking = () => {
     console.log('Booking confirmed for:', bookingDetails);
     setShowConfirmation(false);
-    // Di sini Anda akan memanggil API untuk membuat booking
+    const checkIn = checkInDate?.toISOString().split('T')[0]; // format YYYY-MM-DD
+    const checkOut = checkOutDate?.toISOString().split('T')[0];
+
+    router.push(
+      `/dashboard/booking/${selectedRoom?.id}?check_in=${checkIn}&check_out=${checkOut}&guest_adults=${guests}`,
+    );
   };
-
-  //   const canNavigateToPrevMonth = () => {
-  //     const today = new Date();
-  //     const prevMonth = new Date(currentCalendarDate);
-  //     prevMonth.setMonth(currentCalendarDate.getMonth() - 1);
-
-  //     // Allow navigation to previous month if it contains future dates
-  //     return (
-  //       prevMonth.getFullYear() > today.getFullYear() ||
-  //       (prevMonth.getFullYear() === today.getFullYear() &&
-  //         prevMonth.getMonth() >= today.getMonth())
-  //     );
-  //   };
 
   return (
     <>

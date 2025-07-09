@@ -21,6 +21,7 @@ export default function BookingConfirmationPage() {
   const [room, setRoom] = useState<RoomType | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const [form, setForm] = useState<CreateBookingInput>({
     user_id: '',
@@ -33,6 +34,7 @@ export default function BookingConfirmationPage() {
     email: '',
     phone: '',
     payment_method: 'MIDTRANS',
+    total_price: '',
   });
 
   const getTotalNights = () => {
@@ -43,14 +45,21 @@ export default function BookingConfirmationPage() {
     return Math.max(diff, 1);
   };
 
-  const getTotalPrice = () => {
+  const getTotalPrice = (basePrice: number) => {
     const nights = getTotalNights();
-    return room ? room.base_price * nights : 0;
+    return basePrice * nights;
   };
+
+  const totalNights = getTotalNights();
+  const roomPrice = room?.base_price ? room.base_price * totalNights : 0;
+  const serviceFee = Math.round(roomPrice * 0.05);
+  const tax = Math.round(roomPrice * 0.11);
+  const total = roomPrice + serviceFee + tax;
 
   useEffect(() => {
     const fetchData = async () => {
       const session = getClientSession();
+
       if (!session || session.role !== 'TRAVELLER') {
         router.push('/login');
         return;
@@ -58,12 +67,14 @@ export default function BookingConfirmationPage() {
 
       try {
         const roomData = await getRoomById(roomId as string);
+        console.log('roomData:', roomData);
 
         setRoom(roomData);
         setForm((prev) => ({
           ...prev,
           user_id: session.id,
           room_id: roomData.id,
+          total_price: getTotalPrice(roomData.base_price).toString(),
         }));
       } catch (error) {
         console.error('Room not found:', error);
@@ -74,20 +85,6 @@ export default function BookingConfirmationPage() {
     };
 
     fetchData();
-  }, [roomId, router]);
-
-  useEffect(() => {
-    const session = getClientSession();
-    if (session?.role === 'TRAVELLER') {
-      setForm((prev) => ({
-        ...prev,
-        user_id: session.id,
-        room_id: roomId as string,
-      }));
-    } else {
-      alert('Unauthorized: Only TRAVELLER can book');
-      router.push('/login');
-    }
   }, [roomId, router]);
 
   const handleChange = (
@@ -107,6 +104,7 @@ export default function BookingConfirmationPage() {
 
     try {
       const booking = await createBooking(form);
+      setIsRedirecting(true);
       if (form.payment_method === 'MIDTRANS') {
         const res = await api.post('/payments/snap', {
           bookingId: booking.id,
@@ -193,7 +191,7 @@ export default function BookingConfirmationPage() {
   }
 
   return (
-    <div className="min-h-screen pt-15">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-7 py-17 grid grid-cols-1 md:grid-cols-2 gap-6 font-sans bg-gray-50 rounded-2xl shadow-lg">
         {/* Left: Form */}
         <div className="space-y-6">
@@ -319,7 +317,7 @@ export default function BookingConfirmationPage() {
             <Image
               src={
                 room.images?.[0]?.image_url ||
-                'https://via.placeholder.com/400x200'
+                'https://i.pinimg.com/736x/2a/86/a5/2a86a560f0559704310d98fc32bd3d32.jpg'
               }
               alt={room.name || 'Room Image'}
               fill
@@ -342,30 +340,66 @@ export default function BookingConfirmationPage() {
 
             <p className="font-medium mt-4 text-gray-600">Guest</p>
             <p className="text-gray-600">
-              Adults: <span className="float-right">{form.guest_adults}</span>
-            </p>
-            <p className="text-gray-600">
-              Children:{' '}
-              <span className="float-right">{form.guest_children}</span>
+              Guest: <span className="float-right">{form.guest_adults}</span>
             </p>
 
             <p className="font-medium mt-4 text-gray-600">Price Breakdown</p>
             <p className="text-gray-600">
-              Rooms ({getTotalNights()} night{getTotalNights() > 1 ? 's' : ''}):{' '}
+              Rooms ({totalNights} night{totalNights > 1 ? 's' : ''}):
               <span className="float-right">
-                IDR{' '}
-                {(room.base_price * getTotalNights()).toLocaleString('id-ID')}
+                IDR {roomPrice.toLocaleString('id-ID')}
+              </span>
+            </p>
+            <p className="text-gray-600">
+              Service Fee (5%):
+              <span className="float-right">
+                IDR {serviceFee.toLocaleString('id-ID')}
+              </span>
+            </p>
+            <p className="text-gray-600">
+              Tax (11%):
+              <span className="float-right">
+                IDR {tax.toLocaleString('id-ID')}
               </span>
             </p>
             <p className="font-bold mt-2 text-gray-600">
-              Total:{' '}
+              Total:
               <span className="float-right">
-                IDR {getTotalPrice().toLocaleString('id-ID')}
+                IDR {total.toLocaleString('id-ID')}
               </span>
             </p>
           </div>
         </div>
       </div>
+      {isRedirecting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg flex items-center gap-3">
+            <svg
+              className="animate-spin h-6 w-6 text-blue-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+            <p className="text-blue-700 font-medium">
+              Redirecting to payment...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

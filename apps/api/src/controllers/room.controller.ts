@@ -26,20 +26,21 @@ export class RoomController {
   }
 
   public async findRoomById(req: Request, res: Response): Promise<void> {
-    console.log('Room ID requested:', req.params.id);
+  console.log('Room ID requested:', req.params.id);
 
-    try {
-      const room = await this.service.findRoomById(req.params.id);
-      if (!room) {
-        res.status(404).json({ message: 'Room not found' });
-        return;
-      }
-      res.status(200).json(room);
-    } catch (error) {
-      console.error('Find Room Error:', error);
-      res.status(500).json({ message: 'Failed to fetch room', error });
+  try {
+    const room = await this.service.findRoomById(req.params.id);
+    if (!room) {
+      res.status(404).json({ message: 'Room not found' });
+      return;
     }
+    res.status(200).json({ data: room });
+  } catch (error) {
+    console.error('Find Room Error:', error);
+    res.status(500).json({ message: 'Failed to fetch room', error });
   }
+}
+
 
   public async updateRoom(req: Request, res: Response): Promise<void> {
     try {

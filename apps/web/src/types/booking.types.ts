@@ -18,6 +18,7 @@ export interface CreateBookingInput {
   email: string;
   phone: string;
   payment_method: PaymentMethod;
+  total_price: string; 
 }
 
 export interface Booking {

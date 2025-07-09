@@ -51,6 +51,36 @@ export const Navbar = ({ user }: { user?: User | null }) => {
     router.push('/');
   };
 
+  {
+    /* Spinner Overlay */
+  }
+  {
+    isLoading && (
+      <div className="fixed inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-[999]">
+        <svg
+          className="animate-spin h-10 w-10 text-blue-600"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v8z"
+          />
+        </svg>
+      </div>
+    );
+  }
+
   return (
     <>
       <nav className={navClass}>
@@ -116,7 +146,9 @@ export const Navbar = ({ user }: { user?: User | null }) => {
                       Profile
                     </button>
                     <button
-                      onClick={() => handleNavigate('/my-book')}
+                      onClick={() =>
+                        handleNavigate('/dashboard/booking/my-booking')
+                      }
                       className="w-full text-left text-sm text-gray-700 hover:bg-gray-100 rounded px-2 py-1"
                     >
                       My Book
@@ -135,32 +167,6 @@ export const Navbar = ({ user }: { user?: User | null }) => {
         </div>
       </nav>
       {!isHome && <div className="h-[64px]" />}
-
-      {/* Spinner Overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-[999]">
-          <svg
-            className="animate-spin h-10 w-10 text-blue-600"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v8z"
-            />
-          </svg>
-        </div>
-      )}
     </>
   );
 };

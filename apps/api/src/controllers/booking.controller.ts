@@ -7,12 +7,16 @@ export class BookingController {
   public async createBooking(req: Request, res: Response) {
     try {
       const data = req.body;
+      console.log('📦 Booking data received:', data);
+
       const booking = await service.createBooking(data);
       res.status(201).json({
         message: 'Booking created successfully',
         data: booking,
       });
     } catch (err) {
+      console.error('❌ Create booking error:', err); 
+      
       res.status(500).json({ message: 'Failed to create booking', error: err });
     }
   }
