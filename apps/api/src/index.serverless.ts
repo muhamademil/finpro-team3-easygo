@@ -16,6 +16,7 @@
 
 //   server.emit('request', req, res);
 // }
+import 'module-alias/register';
 import app from './index';
 // require('module-alias/register');
 
