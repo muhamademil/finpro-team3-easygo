@@ -48,7 +48,7 @@ export type Category = {
 export interface Propertyadd {
   id: string;
   name: string;
-  basePrice: number;
+  basePrice?: number;
 }
 
 export interface PricingData {
