@@ -17,7 +17,7 @@
 //   server.emit('request', req, res);
 // }
 import 'module-alias/register';
-import app from './index';
-// require('module-alias/register');
+import App from './app';
 
-export default app;
+const app = new App();
+export default app.expressApp;
