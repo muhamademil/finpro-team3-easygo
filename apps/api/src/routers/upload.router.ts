@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { UploadController } from '../controllers/upload.controller';
-import { tenantMiddleware } from 'middleware/tenant.middleware';
+import { tenantMiddleware } from '@/middleware/tenant.middleware';
 
 export class UploadRouter {
   private router: Router;
