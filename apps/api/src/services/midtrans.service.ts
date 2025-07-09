@@ -1,6 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../lib/prisma';
 import { addMinutes, format } from 'date-fns';
 
 dotenv.config();

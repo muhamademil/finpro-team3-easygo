@@ -1,8 +1,8 @@
 // src/routers/review.router.ts
 import { Router } from 'express';
-import { ReviewController } from '@/controllers/review.controller';
-import { authMiddleware } from '@/middleware/auth.middleware';
-import { tenantMiddleware } from '@/middleware/tenant.middleware';
+import { ReviewController } from '../controllers/review.controller';
+import { authMiddleware } from '../middleware/auth.middleware';
+import { tenantMiddleware } from '../middleware/tenant.middleware';
 
 export class ReviewRouter {
   private router = Router();

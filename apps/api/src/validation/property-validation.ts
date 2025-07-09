@@ -2,7 +2,7 @@ import { z, ZodType } from 'zod';
 import {
   CreatePropertyInput,
   UpdatePropertyInput,
-} from '@/models/property.model';
+} from '../models/property.model';
 
 const RoomSchema = z.object({
   name: z.string().min(3, 'Nama kamar minimal 3 karakter'),

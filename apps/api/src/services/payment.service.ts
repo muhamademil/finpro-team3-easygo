@@ -1,5 +1,5 @@
-import { prisma } from '@/prisma/client';
-import { CreatePaymentInput } from '@/types/payment.types';
+import { prisma } from '../prisma/client';
+import { CreatePaymentInput } from '../types/payment.types';
 import { BookingStatus } from '@prisma/client';
 
 export class PaymentService {

@@ -1,6 +1,6 @@
 // src/services/room.service.ts
-import { prisma } from '@/prisma/client';
-import { CreateRoomInput, UpdateRoomInput } from '@/types/room.types';
+import { prisma } from '../prisma/client';
+import { CreateRoomInput, UpdateRoomInput } from '../types/room.types';
 import { startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 
 export class RoomService {
