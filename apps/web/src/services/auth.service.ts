@@ -28,3 +28,7 @@ export const forgotPasswordAPI = (data: ForgotPasswordInput) => {
 export const resetPasswordAPI = (data: ResetPasswordInput) => {
   return api.post('/auth/reset-password', data);
 };
+
+export const googleLoginAPI = (accessToken: string) => {
+  return api.post('/auth/google/login', { accessToken });
+};

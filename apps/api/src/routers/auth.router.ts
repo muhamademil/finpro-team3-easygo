@@ -24,7 +24,7 @@ export class AuthRouter {
     this.router.post('/forgot-password', this.authController.forgotPassword);
     this.router.post('/reset-password', this.authController.resetPassword);
 
-    // this.router.get('/auth/google', this.authController.passport.authenticate('google', { scope: ['profile', 'email'] }))
+    this.router.post('/google/login', this.authController.googleLogin);
   }
 
   getRouter(): Router {

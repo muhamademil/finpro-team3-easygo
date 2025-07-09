@@ -185,8 +185,7 @@ export type RoomInput = {
   name: string;
   base_price: number;
   max_guest: number;
-  // Kita tidak mengirim URL gambar kamar secara langsung di sini
-  // karena logika upload akan menanganinya
+  imageUrl?: string;
 };
 
 // Tipe untuk payload saat MEMBUAT properti baru

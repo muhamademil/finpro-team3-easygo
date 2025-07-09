@@ -31,6 +31,22 @@ export class RoomRouter {
       this.controller.deleteRoom.bind(this.controller),
     );
     this.router.get('/:roomId/availability', this.controller.getAvailability);
+    // Availability endpoints
+    this.router.get('/:roomId/availability', this.controller.getAvailability);
+    this.router.put(
+      '/:roomId/availability',
+      this.controller.updateAvailability,
+    );
+
+    // Peak price endpoints
+    this.router.put('/:roomId/peak-price', this.controller.updatePeakPrice);
+    this.router.delete('/:roomId/peak-price', this.controller.deletePeakPrice);
+
+    // Get rooms by property
+    this.router.get(
+      '/property/:propertyId/rooms',
+      this.controller.getRoomsByProperty,
+    );
   }
 
   public getRouter(): Router {

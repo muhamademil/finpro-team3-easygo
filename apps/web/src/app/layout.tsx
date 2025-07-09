@@ -1,3 +1,4 @@
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import type { Metadata } from 'next';
 import './globals.css';
 import localFont from 'next/font/local';
@@ -88,15 +89,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  if (!googleClientId) {
+    console.error('Google Client ID tidak ditemukan di environment variables.');
+    return (
+      <html lang="en">
+        <body>
+          <div>Error: Konfigurasi Google Login tidak ditemukan.</div>
+        </body>
+      </html>
+    );
+  }
   return (
     <html
       lang="en"
       className={`${satoshi.variable} ${clashGrotesk.variable} font-sans`}
     >
       <body>
-        <MainNavbar />
-        <main>{children}</main>
-        <Footer />
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <MainNavbar />
+          <main>{children}</main>
+          <Footer />
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

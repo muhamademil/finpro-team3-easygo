@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
-
-// Impor services API dari frontend
 import { getUploadSignatureAPI } from '@/services/upload.service';
 import { createPropertyAPI } from '@/services/property.service';
 import { getFacilitiesAPI } from '@/services/facilities.service';
@@ -15,7 +13,7 @@ export type Facility = {
 };
 
 export type RoomData = {
-  id: string; // ID unik untuk mapping di React
+  id: string;
   title: string;
   maxGuests: number;
   price: number;
@@ -44,12 +42,10 @@ type SubmitResult = {
   data: Property;
 };
 
-// Tipe untuk state dan actions di store kita
 type ListingState = {
   currentStep: number;
   listingData: ListingData;
   setPropertyType: (type: ListingData['propertyType']) => void;
-  // Menggunakan Generics untuk membuat setField menjadi type-safe
   setField: <K extends keyof ListingData>(
     field: K,
     value: ListingData[K],
@@ -69,12 +65,11 @@ type ListingState = {
   setRoomPhoto: (roomId: string, file: File | null) => void;
   removeRoom: (roomId: string) => void;
   toggleFacility: (facility: string) => void;
-  errors: FormErrors; // <-- STATE BARU UNTUK ERRORS
-  validateAndGoToNextStep: () => boolean; // <-- ACTION NEXTSTEP YANG BARU
+  errors: FormErrors;
+  validateAndGoToNextStep: () => boolean;
   clearErrors: () => void;
   submitListing: () => Promise<SubmitResult>;
   isLoading: boolean;
-
   masterFacilities: Facility[];
   fetchFacilities: () => Promise<void>;
 };
@@ -107,7 +102,6 @@ export const useListingStore = create<ListingState>((set, get) => ({
       set({ masterFacilities: response.data.data });
     } catch (error) {
       console.error('Gagal mengambil data fasilitas:', error);
-      // Anda bisa menambahkan penanganan error di sini jika perlu
     }
   },
 
@@ -116,11 +110,8 @@ export const useListingStore = create<ListingState>((set, get) => ({
     const { listingData } = get();
 
     try {
-      // --- Langkah 1: Dapatkan "izin" upload dari backend ---
       const { data } = await getUploadSignatureAPI();
       const signatureData = data.data;
-
-      // --- Langkah 2: Siapkan semua file untuk di-upload ---
       const allFilesToUpload = [
         ...listingData.mainPhotos,
         ...listingData.rooms
@@ -134,34 +125,23 @@ export const useListingStore = create<ListingState>((set, get) => ({
         formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
         formData.append('signature', signatureData.signature);
         formData.append('timestamp', signatureData.timestamp);
-
-        console.log({
-          file,
-          api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-          signature: signatureData.signature,
-          timestamp: signatureData.timestamp,
-        });
-
         return axios.post(
           `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!}/image/upload`,
           formData,
         );
       });
 
-      // --- Langkah 3: Upload semua gambar secara paralel ---
       const uploadResults = await Promise.all(uploadPromises);
       const uploadedUrls = uploadResults.map(
         (res) => res.data.secure_url as string,
       );
 
-      // Pisahkan URL untuk main photos dan room photos
       const mainImageUrls = uploadedUrls.slice(
         0,
         listingData.mainPhotos.length,
       );
       const roomImageUrls = uploadedUrls.slice(listingData.mainPhotos.length);
 
-      // --- Langkah 4: Siapkan payload final untuk API backend ---
       const finalPayload: CreatePropertyInput = {
         name: listingData.title,
         description: listingData.description,
@@ -180,12 +160,10 @@ export const useListingStore = create<ListingState>((set, get) => ({
         })),
       };
 
-      // --- Langkah 5: Kirim data final ke API backend ---
       const response = await createPropertyAPI(finalPayload);
-      console.log(response);
 
       set({ isLoading: false });
-      return response.data; // Kembalikan data properti yang baru dibuat
+      return response.data;
     } catch (error) {
       console.error('Error submitting listing:', error);
       set({
@@ -217,8 +195,6 @@ export const useListingStore = create<ListingState>((set, get) => ({
     const newErrors: FormErrors = {};
     let isValid = true;
 
-    // --- LOGIKA VALIDASI PER LANGKAH ---
-
     if (currentStep === 2) {
       if (!listingData.propertyType) {
         newErrors.propertyType = 'Tipe properti harus dipilih.';
@@ -239,37 +215,33 @@ export const useListingStore = create<ListingState>((set, get) => ({
         newErrors.address = 'Alamat tidak boleh kosong.';
         isValid = false;
       }
-      // Tambahkan validasi lain untuk step 3 jika perlu...
     }
 
     if (currentStep === 4) {
       if (listingData.mainPhotos.length < 5) {
-        newErrors.mainPhotos = 'Harap upload minimal 5 foto utama.'; // Pesan error spesifik
+        newErrors.mainPhotos = 'Harap upload minimal 5 foto utama.';
         isValid = false;
       }
       if (
         listingData.rooms.some((room) => !room.title.trim() || room.price <= 0)
       ) {
         newErrors.rooms =
-          'Pastikan semua kamar memiliki judul dan harga yang valid.'; // Pesan error spesifik
+          'Pastikan semua kamar memiliki judul dan harga yang valid.';
         isValid = false;
       }
-      // ... validasi lain untuk step 4
     }
 
-    // Update state error
     set({ errors: newErrors });
 
     if (isValid) {
-      // Jika valid, bersihkan error dan lanjutkan ke step berikutnya
       set({ errors: {} });
       if (currentStep < 4) {
         set({ currentStep: currentStep + 1 });
       }
-      return true; // Beri sinyal sukses
+      return true;
     }
 
-    return false; // Beri sinyal gagal
+    return false;
   },
 
   setPropertyType: (type) =>
@@ -286,7 +258,6 @@ export const useListingStore = create<ListingState>((set, get) => ({
       listingData: { ...state.listingData, [field]: value },
     })),
 
-  // Action spesifik untuk koordinat
   setCoordinates: (coords) =>
     set((state) => ({
       listingData: {

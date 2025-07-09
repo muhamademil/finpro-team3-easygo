@@ -35,6 +35,7 @@ interface PriceControlPanelProps {
   percentageAmount: string;
   onPercentageAmountChange: (percentage: string) => void;
   onSave: () => void;
+  loading: boolean;
 }
 
 export default function PriceControlPanel({
@@ -49,6 +50,7 @@ export default function PriceControlPanel({
   percentageAmount,
   onPercentageAmountChange,
   onSave,
+  loading,
 }: PriceControlPanelProps) {
   const calculatePreviewPrice = (): number => {
     if (!isRentalActive) return 0;
@@ -93,7 +95,9 @@ export default function PriceControlPanel({
     <Card className="p-6">
       {/* Current Price */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Price</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          Harga Dasar
+        </h3>
         <div className="text-2xl font-bold text-gray-900">
           IDR {formatPrice(basePrice)}
         </div>
@@ -115,11 +119,12 @@ export default function PriceControlPanel({
               <Switch
                 checked={isRentalActive}
                 onCheckedChange={onRentalActiveChange}
+                disabled={loading}
               />
               <span
                 className={`text-sm font-medium ${isRentalActive ? 'text-green-600' : 'text-red-600'}`}
               >
-                {isRentalActive ? 'On' : 'Off'}
+                {isRentalActive ? 'Aktif' : 'Nonaktif'}
               </span>
             </div>
             <p className="text-sm text-gray-500">
@@ -142,6 +147,7 @@ export default function PriceControlPanel({
               <Select
                 value={priceAdjustmentType}
                 onValueChange={onPriceAdjustmentTypeChange}
+                disabled={loading}
               >
                 <SelectTrigger className="mb-4">
                   <SelectValue />
@@ -163,6 +169,7 @@ export default function PriceControlPanel({
                     onChange={handleNominalInputChange}
                     placeholder="0"
                     className="w-full"
+                    disabled={loading}
                   />
                 </div>
               ) : (
@@ -173,6 +180,7 @@ export default function PriceControlPanel({
                   <Select
                     value={percentageAmount}
                     onValueChange={onPercentageAmountChange}
+                    disabled={loading}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -201,8 +209,9 @@ export default function PriceControlPanel({
           <Button
             onClick={onSave}
             className="w-full bg-blue-600 hover:bg-blue-700"
+            disabled={loading}
           >
-            Simpan
+            {loading ? 'Menyimpan...' : 'Simpan'}
           </Button>
         </>
       )}
