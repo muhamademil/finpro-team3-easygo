@@ -76,13 +76,13 @@ export default class App {
     this.app.use('/api/facilities', facilityRouter.getRouter());
     this.app.use('/api/uploads', uploadRouter.getRouter());
     this.app.use('/api/tenant', tenantRouter.getRouter());
-    this.app.use('/api', bookingRouter.getRouter());
-    this.app.use('/api', roomRouter.getRouter());
-    this.app.use('/api', paymentRouter.getRouter());
+    this.app.use('/api/bookings', bookingRouter.getRouter());
+    this.app.use('/api/rooms', roomRouter.getRouter());
+    this.app.use('/api/payments', paymentRouter.getRouter());
     // this.app.use('/api/rooms', roomRouter.getRouter());
-    this.app.use('/api', reviewRouter.getRouter());
+    this.app.use('/api/reviews', reviewRouter.getRouter());
 
-    this.app.get('/', (req, res) => {
+    this.app.get('/api', (req, res) => {
       res.status(200).json({ message: 'EasyGo API is running 🚀' });
     });
   }

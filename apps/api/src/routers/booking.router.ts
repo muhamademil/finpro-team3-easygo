@@ -14,46 +14,46 @@ export class BookingRouter {
 
   private setRoutes(): void {
     this.router.post(
-      '/bookings',
+      '/',
       authMiddleware,
       this.controller.createBooking.bind(this.controller),
     );
     this.router.get(
-      '/bookings/me',
+      '/me',
       authMiddleware,
       this.controller.findMyBookings.bind(this.controller),
     );
     this.router.get(
-      '/bookings/:id',
+      '/:id',
       authMiddleware,
       this.controller.findBookingById.bind(this.controller),
     );
     this.router.get(
-      '/bookings',
+      '/',
       authMiddleware,
       tenantMiddleware,
       this.controller.findAllBooking.bind(this.controller),
     );
     this.router.put(
-      '/bookings/:id',
+      '/:id',
       authMiddleware,
       tenantMiddleware,
       this.controller.updateBookingStatus.bind(this.controller),
     );
     this.router.patch(
-      '/bookings/:id/approve',
+      '/:id/approve',
       authMiddleware,
       tenantMiddleware,
       this.controller.approveBooking.bind(this.controller),
     );
     this.router.patch(
-      '/bookings/:id/reject',
+      '/:id/reject',
       authMiddleware,
       tenantMiddleware,
       this.controller.rejectBooking.bind(this.controller),
     );
     this.router.delete(
-      '/bookings/:id',
+      '/:id',
       authMiddleware,
       tenantMiddleware,
       this.controller.deleteBooking.bind(this.controller),

@@ -14,22 +14,22 @@ export class ReviewRouter {
 
   private setRoutes(): void {
     this.router.post(
-      '/reviews',
+      '/',
       authMiddleware,
       this.controller.createReview.bind(this.controller),
     );
     this.router.get(
-      '/reviews/booking/:bookingId',
+      '/booking/:bookingId',
       authMiddleware,
       this.controller.getReviewByBookingId.bind(this.controller),
     );
     this.router.get(
-      '/reviews/property/:propertyId',
+      '/property/:propertyId',
       authMiddleware,
       this.controller.getReviewsByPropertyId.bind(this.controller),
     );
     this.router.delete(
-      '/reviews/:id',
+      '/:id',
       authMiddleware,
       tenantMiddleware,
       this.controller.deleteReviews.bind(this.controller),

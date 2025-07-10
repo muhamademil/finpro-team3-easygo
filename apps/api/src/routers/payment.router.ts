@@ -15,38 +15,46 @@ export class PaymentRouter {
 
   private setRoutes(): void {
     this.router.post(
-      '/payments',
+      '/',
+      authMiddleware,
       this.controller.createPayment.bind(this.controller),
     );
     this.router.get(
-      '/payments',
+      '/',
+      authMiddleware,
       this.controller.getAllPayments.bind(this.controller),
     );
     this.router.get(
-      '/payments/:id',
+      '/:id',
+      authMiddleware,
       this.controller.getPaymentById.bind(this.controller),
     );
     this.router.delete(
-      '/payments/:id',
+      '/:id',
+      authMiddleware,
       this.controller.deletePayment.bind(this.controller),
     );
     this.router.post(
-      '/payments/midtrans-webhook',
+      '/midtrans-webhook',
+      authMiddleware,
       this.midtransController.handleWebhook.bind(this.midtransController),
     );
 
     this.router.post(
-      '/payments/snap',
+      '/snap',
+      authMiddleware,
       this.midtransController.createSnapTransaction.bind(
         this.midtransController,
       ),
     );
     this.router.post(
-      '/payments/snap/:bookingId',
+      '/snap/:bookingId',
+      authMiddleware,
       this.midtransController.getSnapTransaction.bind(this.midtransController),
     );
     this.router.patch(
-      '/payments/confirm/:bookingId',
+      '/confirm/:bookingId',
+      authMiddleware,
       this.controller.confirmManualPayment.bind(this.controller),
     );
   }

@@ -68,7 +68,9 @@ export default function MyBookingsPage() {
         {bookings.map((booking) => {
           const { room, check_in, check_out, status, review, id } = booking;
           const property = room.property;
-          const image = room.images[0]?.image_url;
+          const fallbackImage =
+            'https://i.pinimg.com/1200x/2a/86/a5/2a86a560f0559704310d98fc32bd3d32.jpg';
+          const image = room.images[0]?.image_url || fallbackImage;
 
           return (
             <div

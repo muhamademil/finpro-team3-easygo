@@ -11,28 +11,28 @@ export class RoomRouter {
 
   private setRoutes(): void {
     this.router.post(
-      '/rooms',
+      '/',
       this.controller.createRoom.bind(this.controller),
     );
     this.router.get(
-      '/rooms',
+      '/',
       this.controller.findAllRooms.bind(this.controller),
     );
     this.router.get(
-      '/rooms/:id',
+      '/:id',
       this.controller.findRoomById.bind(this.controller),
     );
     this.router.put(
-      '/rooms/:id',
+      '/:id',
       this.controller.updateRoom.bind(this.controller),
     );
     this.router.delete(
-      '/rooms/:id',
+      '/:id',
       this.controller.deleteRoom.bind(this.controller),
     );
-    this.router.get('/rooms/:roomId/availability', this.controller.getAvailability);
+    this.router.get('/:roomId/availability', this.controller.getAvailability);
     // Availability endpoints
-    this.router.get('/rooms/:roomId/availability', this.controller.getAvailability);
+    this.router.get('/:roomId/availability', this.controller.getAvailability);
     this.router.put(
       '/:roomId/availability',
       this.controller.updateAvailability,

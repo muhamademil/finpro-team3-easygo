@@ -11,7 +11,7 @@ import { useRouter, usePathname } from 'next/navigation';
 
 export const Navbar = ({ user }: { user?: User | null }) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // 👈 NEW STATE
+  const [isLoading, setIsLoading] = useState(false);
   const { logout } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -36,16 +36,20 @@ export const Navbar = ({ user }: { user?: User | null }) => {
     };
   }, [isHome]);
 
+  useEffect(() => {
+    setIsLoading(false);
+  }, [pathname]);
+
   const navClass = `fixed w-full z-50 transition-all duration-300 ${
     isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
   }`;
 
-  const handleNavigate = async (path: string) => {
+  const handleNavigate = (path: string) => {
     setIsLoading(true);
     router.push(path);
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     setIsLoading(true);
     logout();
     router.push('/');
@@ -53,6 +57,7 @@ export const Navbar = ({ user }: { user?: User | null }) => {
 
   return (
     <>
+      {/* Loader Overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-[999]">
           <svg
@@ -77,6 +82,8 @@ export const Navbar = ({ user }: { user?: User | null }) => {
           </svg>
         </div>
       )}
+
+      {/* Navbar */}
       <nav className={navClass}>
         <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
           {/* Logo */}
@@ -95,7 +102,7 @@ export const Navbar = ({ user }: { user?: User | null }) => {
             />
           </Link>
 
-          {/* Right Content */}
+          {/* Right section */}
           <div className="flex items-center space-x-4">
             {!user ? (
               <>
@@ -160,6 +167,8 @@ export const Navbar = ({ user }: { user?: User | null }) => {
           </div>
         </div>
       </nav>
+
+      {/* Spacer untuk fix layout di halaman non-home */}
       {!isHome && <div className="h-[64px]" />}
     </>
   );
