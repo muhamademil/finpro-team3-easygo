@@ -1,9 +1,9 @@
 // components/features/listing/edit/EditPropertyInfo.tsx
 'use client';
 
-import { useListingStore } from '@/stores/useListing.store';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useListingStore } from '@/src/stores/useListing.store';
+import { Input } from '@/src/components/ui/input';
+import { Textarea } from '@/src/components/ui/textarea';
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
 
@@ -15,7 +15,7 @@ export const EditPropertyInfo = () => {
       dynamic(
         () =>
           import(
-            '@/components/Features/Tenant/Property/Listing/MapPicker'
+            '@/src/components/Features/Tenant/Property/Listing/MapPicker'
           ).then((mod) => mod.MapPicker),
         { ssr: false, loading: () => <p>Loading map...</p> },
       ),

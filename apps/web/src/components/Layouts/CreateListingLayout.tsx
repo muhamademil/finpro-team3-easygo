@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useListingStore } from '@/stores/useListing.store';
-import Button from '@/components/Elements/Button';
+import { useListingStore } from '@/src/stores/useListing.store';
+import Button from '../Elements/Button';
 
 const ProgressBar = ({ currentStep }: { currentStep: number }) => {
   const totalSteps = 4;

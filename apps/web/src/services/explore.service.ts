@@ -1,6 +1,6 @@
-import api from '@/lib/axios';
-import { Property } from '@/types/explore.types';
-import { SearchFilters } from '@/types/explore.types';
+import api from '../lib/axios';
+import { Property } from '../types/property.types';
+import { SearchFilters } from '../types/explore.types';
 
 // Tipe untuk hasil API yang menyertakan pagination
 type PaginatedProperties = {

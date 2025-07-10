@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { LatLngExpression, Icon, Marker as LeafletMarker } from 'leaflet';
 import { useMemo, useRef } from 'react';
-import { useListingStore } from '@/stores/useListing.store';
+import { useListingStore } from '@/src/stores/useListing.store';
 
 const customIcon = new Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',

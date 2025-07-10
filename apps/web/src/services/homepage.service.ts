@@ -1,5 +1,5 @@
-import api from '@/lib/axios';
-import { Property } from '@/types/type';
+import api from '../lib/axios';
+import { Property } from '../types/type';
 
 // Tipe untuk membantu TypeScript memahami struktur respon API
 type ApiResponse = {

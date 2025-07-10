@@ -1,6 +1,6 @@
-import api from '@/lib/axios';
-import { CreatePropertyInput, UpdatePropertyInput } from '@/types/type';
-import type { Property } from '@/types/detailProperty.types';
+import api from '../lib/axios';
+import { CreatePropertyInput, UpdatePropertyInput } from '../types/type';
+import type { Property } from '../types/detailProperty.types';
 
 export const createPropertyAPI = (data: CreatePropertyInput) => {
   return api.post('/properties', data);

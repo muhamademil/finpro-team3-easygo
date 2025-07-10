@@ -11,9 +11,9 @@ import {
   Twitter,
   Youtube,
 } from 'lucide-react';
-import { aboutLinks } from '@/constants/footer';
-import { tenantLinks } from '@/constants/footer';
-import { paymentLogos } from '@/constants/footer';
+import { aboutLinks } from '@/src/constants/footer';
+import { tenantLinks } from '@/src/constants/footer';
+import { paymentLogos } from '@/src/constants/footer';
 
 const HIDDEN_FOOTER_PATHS = ['/dashboard', '/login', '/register', '/new'];
 

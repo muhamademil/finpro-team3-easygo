@@ -15,13 +15,9 @@ import { WhyChooseUsSection } from '@/components/Features/Homepage/Sections/WhyC
 import { NewsletterSection } from '@/components/Features/Homepage/Sections/NewsletterSection';
 
 import { Property } from '@/types/type';
-import { PropertyCard } from '@/components/Features/Shared/PropertyCard';
+import { PropertyCard } from '@/src/components/Features/Shared/PropertyCard';
 
-import {
-  getBandungHitsAPI,
-  getCheapPropertiesAPI,
-  getRecommendedPropertiesAPI,
-} from '@/services/homepage.service';
+import { getBandungHitsAPI, getCheapPropertiesAPI, getRecommendedPropertiesAPI } from '@/src/services/homepage.service';
 
 export default function HomePage() {
   const [bandungHits, setBandungHits] = useState<Property[]>([]);

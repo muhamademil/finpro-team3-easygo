@@ -4,9 +4,9 @@ import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import Button from '@/components/Elements/Button';
+import Button from '../Elements/Button';
 import { ChevronDownIcon } from 'lucide-react';
-import { useAuthStore, User } from '@/stores/useAuth.store';
+import { useAuthStore,User } from '@/src/stores/useAuth.store';
 import { useRouter, usePathname } from 'next/navigation';
 
 export const Navbar = ({ user }: { user?: User | null }) => {

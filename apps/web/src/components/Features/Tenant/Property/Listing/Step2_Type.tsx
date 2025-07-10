@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { useListingStore } from '@/stores/useListing.store';
+import { useListingStore } from '@/src/stores/useListing.store';
 
 const propertyTypes = [
   {

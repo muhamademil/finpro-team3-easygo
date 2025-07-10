@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
-import { getUploadSignatureAPI } from '@/services/upload.service';
-import { createPropertyAPI } from '@/services/property.service';
-import { getFacilitiesAPI } from '@/services/facilities.service';
+import { getUploadSignatureAPI } from '../services/upload.service';
+import { getFacilitiesAPI } from '../services/facilities.service';
+import { createPropertyAPI } from '../services/property.service';
 
-import { CreatePropertyInput, Property } from '@/types/type';
+import { CreatePropertyInput, Property } from '../types/type';
 
 export type Facility = {
   id: string;

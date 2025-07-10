@@ -1,14 +1,14 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
+import { Card } from '@/src/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import type { Room } from '@/types/type';
+} from '@/src/components/ui/select';
+import type { Room } from '@/src/types/type';
 
 interface RoomSelectorProps {
   rooms: Room[];

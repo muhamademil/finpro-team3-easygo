@@ -1,4 +1,4 @@
-import api from '@/lib/axios'; // Gunakan instance Axios terpusat Anda
+import api from "../lib/axios";
 
 export const getFacilitiesAPI = () => {
   return api.get('/facilities');

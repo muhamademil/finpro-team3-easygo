@@ -1,5 +1,5 @@
-import api from '@/lib/axios';
-import { Property } from '@/types/type';
+import api from '../lib/axios';
+import { Property } from '../types/type';
 import { cookies } from 'next/headers';
 
 export const getMyPropertiesAPI = async (): Promise<Property[]> => {

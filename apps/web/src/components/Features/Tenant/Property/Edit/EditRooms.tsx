@@ -1,9 +1,9 @@
 'use client';
 
-import { useListingStore } from '@/stores/useListing.store';
+import { useListingStore } from '@/src/stores/useListing.store';
 import { ImageUploadBox } from '../Listing/ImageUploadBox';
-import { Input } from '@/components/ui/input';
-import Button from '@/components/Elements/Button';
+import { Input } from '@/src/components/ui/input';
+import Button from '@/src/components/Elements/Button';
 import { Trash2 } from 'lucide-react';
 
 export const EditRooms = () => {

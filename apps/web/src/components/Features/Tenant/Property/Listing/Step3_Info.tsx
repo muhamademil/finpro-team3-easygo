@@ -1,10 +1,10 @@
 'use client';
 
-import { useListingStore } from '@/stores/useListing.store';
+import { useListingStore } from '@/src/stores/useListing.store';
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/src/components/ui/input';
+import { Textarea } from '@/src/components/ui/textarea';
 
 export const Step3_Info = () => {
   const { listingData, setField, errors, clearErrors } = useListingStore();
@@ -14,7 +14,7 @@ export const Step3_Info = () => {
       dynamic(
         () =>
           import(
-            '@/components/Features/Tenant/Property/Listing/MapPicker'
+            '@/src/components/Features/Tenant/Property/Listing/MapPicker'
           ).then((mod) => mod.MapPicker),
         { ssr: false },
       ),

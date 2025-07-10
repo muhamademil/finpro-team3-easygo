@@ -1,7 +1,7 @@
 // components/features/listing/edit/EditPropertyType.tsx
 'use client';
 
-import { useListingStore } from '@/stores/useListing.store';
+import { useListingStore } from '@/src/stores/useListing.store';
 
 const propertyTypes = ['VILLA', 'APARTMENT', 'GUEST_HOUSE'] as const;
 

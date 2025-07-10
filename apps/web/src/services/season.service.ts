@@ -1,6 +1,6 @@
-import api from '@/lib/axios';
-import type { Room, Property } from '@/types/type';
-import type { CalendarDayData } from '@/types/season.type';
+import api from '../lib/axios';
+import type { Room, Property } from '../types/type';
+import type { CalendarDayData } from '../types/season.type';
 
 /**
  * Mengambil semua properti milik tenant yang sedang login.

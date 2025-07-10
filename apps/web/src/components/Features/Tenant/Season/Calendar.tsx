@@ -1,9 +1,9 @@
 'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import type { CalendarDayData } from '@/types/season.type';
+import { Button } from '@/src/components/ui/button';
+import { Card } from '@/src/components/ui/card';
+import type { CalendarDayData } from '@/src/types/season.type';
 
 interface CalendarDay {
   date: number;

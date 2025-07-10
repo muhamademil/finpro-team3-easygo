@@ -12,7 +12,7 @@ import {
   Transition,
 } from '@headlessui/react';
 import { Fragment } from 'react';
-import { useAuthStore, User } from '@/stores/useAuth.store';
+import { useAuthStore, User } from '@/src/stores/useAuth.store';
 import { useRouter } from 'next/navigation';
 
 const navLinks = [

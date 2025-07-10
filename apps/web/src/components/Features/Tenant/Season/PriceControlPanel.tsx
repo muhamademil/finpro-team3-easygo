@@ -2,18 +2,18 @@
 
 import type React from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import type { PercentageOption } from '@/types/type';
+} from '@/src/components/ui/select';
+import { Switch } from '@/src/components/ui/switch';
+import { Card } from '@/src/components/ui/card';
+import { Input } from '@/src/components/ui/input';
+import type { PercentageOption } from '@/src/types/type';
 
 const percentageOptions: PercentageOption[] = [
   { value: '5', label: '5%' },

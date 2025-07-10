@@ -2,11 +2,11 @@
 'use client';
 
 import { useState } from 'react';
-import type { Review } from '@/types/type';
+import type { Review } from '@/src/types/type';
 import Image from 'next/image';
 import { Building, Calendar, Star, Send } from 'lucide-react';
-import Button from '@/components/Elements/Button';
-import { Textarea } from '@/components/ui/textarea';
+import Button from '@/src/components/Elements/Button';
+import { Textarea } from '@/src/components/ui/textarea';
 
 type ReviewCardProps = {
   review: Review;

@@ -1,11 +1,11 @@
 'use client';
 
-import { useListingStore } from '@/stores/useListing.store';
+import { useListingStore } from '@/src/stores/useListing.store';
 import { useEffect } from 'react';
 import { ImageUploadBox } from './ImageUploadBox';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import Button from '@/components/Elements/Button';
+import { Input } from '@/src/components/ui/input';
+import { Checkbox } from '@/src/components/ui/checkbox';
+import Button from '@/src/components/Elements/Button';
 import { Trash2 } from 'lucide-react';
 
 export const Step4_Details = () => {

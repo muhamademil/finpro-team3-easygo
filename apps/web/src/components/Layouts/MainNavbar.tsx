@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useAuthStore } from '@/stores/useAuth.store';
+import { useAuthStore } from '@/src/stores/useAuth.store';
 import { Navbar } from './Navbar';
 import { DashboardHeader } from './DashboardHeader';
 

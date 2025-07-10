@@ -1,7 +1,7 @@
 // components/features/penjualan/SalesStatsCards.tsx
 // (Buat folder baru untuk kerapian)
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card';
 
 type SalesStatsProps = {
   totalPendapatan: number;

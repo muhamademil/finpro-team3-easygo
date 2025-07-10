@@ -1,10 +1,10 @@
 'use client';
 
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card,CardContent,CardFooter } from '@/src/components/ui/card';
 import Image from 'next/image';
 import { Star, MapPin } from 'lucide-react';
-import type { Property } from '@/types/type'; // Gunakan tipe terpusat
-import Button from '@/components/Elements/Button';
+import type { Property } from '@/src/types/type';
+import Button from '@/src/components/Elements/Button';
 import Link from 'next/link';
 
 type TenantPropertyCardProps = {

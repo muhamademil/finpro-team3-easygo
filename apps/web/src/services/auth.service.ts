@@ -1,10 +1,10 @@
-import api from '@/lib/axios';
+import api from '../lib/axios';
 import {
   CompleteRegistrationInput,
   ForgotPasswordInput,
   LoginInput,
   ResetPasswordInput,
-} from '@/models/user.model';
+} from '../models/user.model';
 
 export const initiateRegistrationAPI = (data: {
   email: string;
