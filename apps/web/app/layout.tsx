@@ -5,7 +5,7 @@ import localFont from 'next/font/local';
 import { MainNavbar } from '@/components/Layouts/MainNavbar';
 import { Footer } from '@/components/Layouts/Footer';
 
-const satoshi = localFont({
+const Satoshi = localFont({
   src: [
     {
       path: './fonts/Satoshi/Satoshi-Regular.otf',
@@ -52,7 +52,7 @@ const satoshi = localFont({
   display: 'swap',
 });
 
-const clashGrotesk = localFont({
+const ClashGrotesk = localFont({
   src: [
     {
       path: './fonts/ClashGrotesk/ClashGrotesk-Regular.otf',
@@ -103,7 +103,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${satoshi.variable} ${clashGrotesk.variable} font-sans`}
+      className={`${Satoshi.variable} ${ClashGrotesk.variable} font-sans`}
     >
       <body>
         <GoogleOAuthProvider clientId={googleClientId}>
