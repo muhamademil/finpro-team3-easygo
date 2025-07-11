@@ -1,15 +1,10 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "dist/index.serverless.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/handler.ts": {
+      "runtime": "vercel-node@canary"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "dist/index.serverless.js"
-    }
-  ]
+  },
+  "buildCommand": "npm install",
+  "outputDirectory": "dist",
+  "framework": null
 }
