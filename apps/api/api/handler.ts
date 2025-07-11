@@ -6,14 +6,23 @@ import App from '../src/app';
 const appInstance = new App();
 const expressApp = appInstance.expressApp;
 
-export default function handler(req: NowRequest, res: NowResponse) {
+export default async function handler(req: NowRequest, res: NowResponse) {
   try {
+    console.log('[DEBUG] Handler is invoked.');
+    
     const parsedUrl = parse(req.url ?? '/', true);
     req.url = parsedUrl.path || '/';
-    const server = createServer((req2, res2) => expressApp(req2, res2));
+
+    const server = createServer((req2, res2) => {
+      expressApp(req2, res2);
+    });
+
     server.emit('request', req, res);
   } catch (err) {
-    console.error('❌ Handler error:', err);
-    res.status(500).json({ error: true, message: (err as Error).message });
+    console.error('❌ [ERROR in handler]', err);
+    res.status(500).json({
+      success: false,
+      message: (err as Error).message,
+    });
   }
 }
