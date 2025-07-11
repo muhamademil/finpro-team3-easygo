@@ -14,10 +14,6 @@
     {
       "src": "/api/(.*)",
       "dest": "apps/api/dist/index.serverless.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "apps/web/$1"
     }
   ]
 }
