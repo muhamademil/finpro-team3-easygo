@@ -1,7 +1,6 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import type { Metadata } from 'next';
 import './globals.css';
-import localFont from 'next/font/local';
 import { MainNavbar } from '@/components/Layouts/MainNavbar';
 import { Footer } from '@/components/Layouts/Footer';
 
