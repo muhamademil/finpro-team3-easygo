@@ -3,7 +3,7 @@ import {
   CreateBookingInput,
   Booking,
   BookingDetailPayload,
-} from '../types/booking.types';
+} from '../../src/types/booking.types';
 
 export const createBooking = async (
   data: CreateBookingInput,
