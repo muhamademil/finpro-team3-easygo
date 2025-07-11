@@ -5,7 +5,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
+    "dev": "ts-node-dev --respawn src/index.ts",
     "build": "tsc && tsc-alias",
     "postinstall": "prisma generate",
     "serve": "cross-env NODE_ENV=production node dist/index.js",
@@ -15,7 +15,7 @@
     "generate:dev": "npx prisma generate dev",
     "studio": "npx prisma studio",
     "seed": "prisma db seed",
-    "start": "node dist/index.serverless.js"
+    "start": "node dist/index.js"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
