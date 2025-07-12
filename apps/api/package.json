@@ -1,4 +1,3 @@
-
 {
   "name": "api",
   "version": "1.0.0",
@@ -6,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "ts-node-dev --respawn src/index.ts",
-    "build": "tsc && tsc-alias",
+    "build": "prisma generate && tsc && tsc-alias",
     "postinstall": "prisma generate",
     "serve": "cross-env NODE_ENV=production node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",

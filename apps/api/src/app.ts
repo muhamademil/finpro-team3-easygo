@@ -19,6 +19,9 @@ import { ResponseError } from '@/error/response.error';
 import { FacilityRouter } from '@/routers/facility.router';
 import { UploadRouter } from '@/routers/upload.router';
 import { TenantRouter } from '@/routers/tenant.router';
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 export default class App {
   private app: Express;

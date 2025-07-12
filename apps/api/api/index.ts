@@ -1,4 +1,4 @@
-import { NowRequest, NowResponse } from '@vercel/node';
+import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createServer } from 'http';
 import { parse } from 'url';
 import App from '../src/app';
@@ -6,10 +6,11 @@ import App from '../src/app';
 const appInstance = new App();
 const expressApp = appInstance.expressApp;
 
-export default async function handler(req: NowRequest, res: NowResponse) {
+// Vercel serverless handler
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    console.log('[DEBUG] Handler is invoked.');
-    
+    console.log('[DEBUG] Handler invoked');
+
     const parsedUrl = parse(req.url ?? '/', true);
     req.url = parsedUrl.path || '/';
 
@@ -18,11 +19,15 @@ export default async function handler(req: NowRequest, res: NowResponse) {
     });
 
     server.emit('request', req, res);
-  } catch (err) {
-    console.error('❌ [ERROR in handler]', err);
+  } catch (err: unknown) {
+    console.error('❌ [Handler Error]', err);
+
+    let message = 'Internal Server Error';
+    if (err instanceof Error) message = err.message;
+
     res.status(500).json({
       success: false,
-      message: (err as Error).message,
+      message,
     });
   }
 }
