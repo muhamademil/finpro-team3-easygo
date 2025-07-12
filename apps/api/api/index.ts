@@ -1,10 +1,10 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createServer } from 'http';
-import { parse } from 'url';
+// import { createServer } from 'http';
+// import { parse } from 'url';
 import App from '../src/app';
 
-const appInstance = new App();
-const expressApp = appInstance.expressApp;
+// const appInstance = new App();
+// const expressApp = appInstance.expressApp;
 
 // Vercel serverless handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -13,14 +13,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('[DEBUG] Handler invoked', req.method, req.url);
 
 
-    const parsedUrl = parse(req.url ?? '/', true);
-    req.url = parsedUrl.path || '/';
+    // const parsedUrl = parse(req.url ?? '/', true);
+    // req.url = parsedUrl.path || '/';
 
-    const server = createServer((req2, res2) => {
-      expressApp(req2, res2);
-    });
+    // const server = createServer((req2, res2) => {
+    //   expressApp(req2, res2);
+    // });
 
-    server.emit('request', req, res);
+    // server.emit('request', req, res);
   } catch (err: unknown) {
     console.error('❌ [Handler Error]', err);
     console.error('[ERROR]', typeof err, err instanceof Error, err);
