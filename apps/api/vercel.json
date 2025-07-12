@@ -1,9 +1,11 @@
 {
+  "version": 2,
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node@5.3.4"
+      "runtime": "vercel-node@5.3.4"
     }
   },
-  "buildCommand": "npm install && npm run build",
+  "buildCommand": "cd ../../ && npm install && npm run build",
+  "outputDirectory": "apps/api/dist",
   "framework": null
 }
