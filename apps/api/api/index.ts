@@ -10,6 +10,8 @@ const expressApp = appInstance.expressApp;
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     console.log('[DEBUG] Handler invoked');
+    console.log('[DEBUG] Handler invoked', req.method, req.url);
+
 
     const parsedUrl = parse(req.url ?? '/', true);
     req.url = parsedUrl.path || '/';
@@ -21,6 +23,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     server.emit('request', req, res);
   } catch (err: unknown) {
     console.error('❌ [Handler Error]', err);
+    console.error('[ERROR]', typeof err, err instanceof Error, err);
+
 
     let message = 'Internal Server Error';
     if (err instanceof Error) message = err.message;
