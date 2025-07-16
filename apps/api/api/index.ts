@@ -1,3 +1,4 @@
+import 'tsconfig-paths/register';
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import App from '../src/app';
 
